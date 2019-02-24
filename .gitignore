@@ -1,0 +1,11 @@
+*.data
+
+# output file on HPC
+*.out
+
+# sbatch file on HPC
+*.s
+
+# personal test
+data_test/
+
