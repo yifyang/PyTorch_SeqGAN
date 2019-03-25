@@ -16,23 +16,23 @@ from loss import PGLoss
 
 # Arguemnts
 parser = argparse.ArgumentParser(description='SeqGAN')
-parser.add_argument('--hpc', action='store_true', default=False,
+parser.add_argument('--hpc', action='store_true', default=True,
                     help='set to hpc mode')
 parser.add_argument('--data_path', type=str, default='dataset/', metavar='PATH',
                     help='data path to save files (default: /scratch/zc807/seq_gan/)')
 parser.add_argument('--rounds', type=int, default=200, metavar='N',
                     help='rounds of adversarial training (default: 150)')
-parser.add_argument('--g_pretrain_steps', type=int, default=150, metavar='N',
+parser.add_argument('--g_pretrain_steps', type=int, default=200, metavar='N',
                     help='steps of pre-training of generators (default: 120)')
 parser.add_argument('--d_pretrain_steps', type=int, default=60, metavar='N',
                     help='steps of pre-training of discriminators (default: 50)')
 parser.add_argument('--g_steps', type=int, default=1, metavar='N',
                     help='steps of generator updates in one round of adverarial training (default: 1)')
-parser.add_argument('--d_steps', type=int, default=3, metavar='N',
+parser.add_argument('--d_steps', type=int, default=2, metavar='N',
                     help='steps of discriminator updates in one round of adverarial training (default: 3)')
 parser.add_argument('--gk_epochs', type=int, default=1, metavar='N',
                     help='epochs of generator updates in one step of generate update (default: 1)')
-parser.add_argument('--dk_epochs', type=int, default=3, metavar='N',
+parser.add_argument('--dk_epochs', type=int, default=2, metavar='N',
                     help='epochs of discriminator updates in one step of discriminator update (default: 3)')
 parser.add_argument('--update_rate', type=float, default=0.8, metavar='UR',
                     help='update rate of roll-out model (default: 0.8)')

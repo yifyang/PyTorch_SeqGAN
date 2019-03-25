@@ -20,7 +20,7 @@ class Discriminator(nn.Module):
         self.dropout = nn.Dropout(p = dropout_prob)
         self.fc = nn.Linear(sum(num_filters), num_classes)
 
-    def forward(self, x):
+    def forward(self, x, log=True):
         """
         Inputs: x
             - x: (batch_size, seq_len)
@@ -34,5 +34,8 @@ class Discriminator(nn.Module):
         highway = self.highway(out)
         transform = torch.sigmoid(highway)
         out = transform * F.relu(highway) + (1. - transform) * out # sets C = 1 - T
-        out = F.softmax(self.fc(self.dropout(out)), dim=1) # batch * num_classes
+        if log:
+            out = F.log_softmax(self.fc(self.dropout(out)), dim=1)
+        else:
+            out = F.softmax(self.fc(self.dropout(out)), dim=1) # batch * num_classes
         return out
