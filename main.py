@@ -60,7 +60,7 @@ NEGATIVE_FILE = 'gen_self.data'
 
 
 # Genrator Parameters
-g_embed_dim = 32
+g_embed_dim = 64
 g_hidden_dim = 32
 # g_hidden_layer = 3
 g_seq_len = 20
