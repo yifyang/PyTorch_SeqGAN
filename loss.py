@@ -22,7 +22,10 @@ class PGLoss(nn.Module):
         if pred.is_cuda:
             one_hot = one_hot.cuda()
         one_hot.scatter_(1, target.data.view(-1, 1), 1)
+
+        # select probability of word placed in true data (batch_size * seq_len)
         loss = torch.masked_select(pred, one_hot)
+
         loss = loss * reward.contiguous().view(-1)
         loss = -torch.sum(loss)
         return loss
