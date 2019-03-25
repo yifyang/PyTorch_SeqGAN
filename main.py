@@ -18,13 +18,13 @@ from loss import PGLoss
 parser = argparse.ArgumentParser(description='SeqGAN')
 parser.add_argument('--hpc', action='store_true', default=False,
                     help='set to hpc mode')
-parser.add_argument('--data_path', type=str, default='/scratch/zc807/seq_gan/', metavar='PATH',
+parser.add_argument('--data_path', type=str, default='dataset/', metavar='PATH',
                     help='data path to save files (default: /scratch/zc807/seq_gan/)')
-parser.add_argument('--rounds', type=int, default=150, metavar='N',
+parser.add_argument('--rounds', type=int, default=200, metavar='N',
                     help='rounds of adversarial training (default: 150)')
-parser.add_argument('--g_pretrain_steps', type=int, default=120, metavar='N',
+parser.add_argument('--g_pretrain_steps', type=int, default=150, metavar='N',
                     help='steps of pre-training of generators (default: 120)')
-parser.add_argument('--d_pretrain_steps', type=int, default=50, metavar='N',
+parser.add_argument('--d_pretrain_steps', type=int, default=60, metavar='N',
                     help='steps of pre-training of discriminators (default: 50)')
 parser.add_argument('--g_steps', type=int, default=1, metavar='N',
                     help='steps of generator updates in one round of adverarial training (default: 1)')
@@ -38,11 +38,11 @@ parser.add_argument('--update_rate', type=float, default=0.8, metavar='UR',
                     help='update rate of roll-out model (default: 0.8)')
 parser.add_argument('--n_rollout', type=int, default=16, metavar='N',
                     help='number of roll-out (default: 16)')
-parser.add_argument('--vocab_size', type=int, default=5000, metavar='N',
+parser.add_argument('--vocab_size', type=int, default=20, metavar='N',
                     help='vocabulary size (default: 5000)')
 parser.add_argument('--batch_size', type=int, default=64, metavar='N',
                     help='batch size (default: 64)')
-parser.add_argument('--n_samples', type=int, default=10000, metavar='N',
+parser.add_argument('--n_samples', type=int, default=6400, metavar='N',
                     help='number of samples gerenated per time (default: 10000)')
 parser.add_argument('--gen_lr', type=float, default=1e-3, metavar='LR',
                     help='learning rate of generator optimizer (default: 1e-3)')
@@ -55,13 +55,14 @@ parser.add_argument('--seed', type=int, default=1, metavar='S',
 
 
 # Files
-POSITIVE_FILE = 'real_big.data'
-NEGATIVE_FILE = 'gene_big.data'
+POSITIVE_FILE = 'self.data'
+NEGATIVE_FILE = 'gen_self.data'
 
 
 # Genrator Parameters
 g_embed_dim = 32
 g_hidden_dim = 32
+# g_hidden_layer = 3
 g_seq_len = 20
 
 
@@ -69,7 +70,9 @@ g_seq_len = 20
 d_num_class = 2
 d_embed_dim = 64
 d_filter_sizes = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 15, 20]
+# d_filter_sizes = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10]
 d_num_filters = [100, 200, 200, 200, 200, 100, 100, 100, 100, 100, 160, 160]
+# d_num_filters = [100, 200, 200, 200, 200, 100, 100, 100, 100, 100]
 d_dropout_prob = 0.2
 
 
@@ -133,6 +136,8 @@ def train_generator_PG(gen, dis, rollout, pg_loss, optimizer, epochs, args):
         optimizer.zero_grad()
         loss.backward()
         optimizer.step()
+
+        print("Epoch {}, train loss: {:.5f}".format(epoch, loss))
 
 
 def eval_generator(model, data_iter, criterion, args):
@@ -233,7 +238,7 @@ if __name__ == '__main__':
     if args.cuda:
         torch.cuda.manual_seed(args.seed)
     if not args.hpc:
-        args.data_path = ''
+        args.data_path = 'data_test/'
     POSITIVE_FILE = args.data_path + POSITIVE_FILE
     NEGATIVE_FILE = args.data_path + NEGATIVE_FILE
 
@@ -324,7 +329,10 @@ if __name__ == '__main__':
         dis_adversarial_eval_acc.append(dis_acc)
         print("gen eval loss: {:.5f}, dis eval loss: {:.5f}, dis eval acc: {:.3f}\n"
             .format(gen_loss, dis_loss, dis_acc))
+        print("dis eval loss: {:.5f}, dis eval acc: {:.3f}\n"
+              .format(dis_loss, dis_acc))
 
+    """
     # Save experiment data
     with open(args.data_path + 'experiment.pkl', 'wb') as f:
         pkl.dump(
@@ -342,3 +350,4 @@ if __name__ == '__main__':
             f,
             protocol=pkl.HIGHEST_PROTOCOL
         )
+    """

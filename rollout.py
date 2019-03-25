@@ -29,7 +29,7 @@ class Rollout(object):
                 data = x[:, 0:l]
                 samples = self.own_model.sample(batch_size, seq_len, data)
                 pred = discriminator(samples)
-                pred = pred.cpu().data[:,1].numpy()
+                pred = pred.cpu().data[:,1].numpy() - 0.5
                 if i == 0:
                     rewards.append(pred)
                 else:

@@ -78,7 +78,7 @@ class Generator(nn.Module):
             for _ in range(seq_len):
                 out, h, c = self.step(x, h, c)
                 prob = torch.exp(out)
-                x = torch.multinomial(prob, 1)
+                x = torch.multinomial(prob, 1) # select the next word with largest probability
                 samples.append(x)
         else:
             h, c = self.init_hidden(x.size(0))
