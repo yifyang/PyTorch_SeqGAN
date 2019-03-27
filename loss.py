@@ -22,7 +22,7 @@ class PGLoss(nn.Module):
         if pred.is_cuda:
             one_hot = one_hot.cuda()
         one_hot.scatter_(1, target.data.view(-1, 1), 1)
-        loss = torch.masked_select(pred, one_hot)
-        loss = loss * reward.contiguous().view(-1)
+        loss = torch.masked_select(pred, one_hot) # select the probability predicted of the target word
+        loss = loss * reward.contiguous().view(-1) # obtain the loss of not choosing target word
         loss = -torch.sum(loss)
         return loss
