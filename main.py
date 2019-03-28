@@ -16,10 +16,10 @@ from loss import PGLoss
 
 # Arguemnts
 parser = argparse.ArgumentParser(description='SeqGAN')
-parser.add_argument('--hpc', action='store_true', default=False,
+parser.add_argument('--hpc', action='store_true', default=True,
                     help='set to hpc mode')
-parser.add_argument('--data_path', type=str, default='/scratch/zc807/seq_gan/', metavar='PATH',
-                    help='data path to save files (default: /scratch/zc807/seq_gan/)')
+parser.add_argument('--data_path', type=str, default='dataset/', metavar='PATH',
+                    help='data path to save files (default: dataset/)')
 parser.add_argument('--rounds', type=int, default=150, metavar='N',
                     help='rounds of adversarial training (default: 150)')
 parser.add_argument('--g_pretrain_steps', type=int, default=120, metavar='N',
@@ -38,11 +38,11 @@ parser.add_argument('--update_rate', type=float, default=0.8, metavar='UR',
                     help='update rate of roll-out model (default: 0.8)')
 parser.add_argument('--n_rollout', type=int, default=16, metavar='N',
                     help='number of roll-out (default: 16)')
-parser.add_argument('--vocab_size', type=int, default=5000, metavar='N',
+parser.add_argument('--vocab_size', type=int, default=20, metavar='N',
                     help='vocabulary size (default: 5000)')
 parser.add_argument('--batch_size', type=int, default=64, metavar='N',
                     help='batch size (default: 64)')
-parser.add_argument('--n_samples', type=int, default=10000, metavar='N',
+parser.add_argument('--n_samples', type=int, default=6400, metavar='N',
                     help='number of samples gerenated per time (default: 10000)')
 parser.add_argument('--gen_lr', type=float, default=1e-3, metavar='LR',
                     help='learning rate of generator optimizer (default: 1e-3)')
@@ -55,12 +55,12 @@ parser.add_argument('--seed', type=int, default=1, metavar='S',
 
 
 # Files
-POSITIVE_FILE = 'real_big.data'
-NEGATIVE_FILE = 'gene_big.data'
+POSITIVE_FILE = 'self.data'
+NEGATIVE_FILE = 'gen_self.data'
 
 
 # Genrator Parameters
-g_embed_dim = 32
+g_embed_dim = 64
 g_hidden_dim = 32
 g_seq_len = 20
 
@@ -233,7 +233,7 @@ if __name__ == '__main__':
     if args.cuda:
         torch.cuda.manual_seed(args.seed)
     if not args.hpc:
-        args.data_path = ''
+        args.data_path = '../pytorch_SeqGAN/data_test/'
     POSITIVE_FILE = args.data_path + POSITIVE_FILE
     NEGATIVE_FILE = args.data_path + NEGATIVE_FILE
 
