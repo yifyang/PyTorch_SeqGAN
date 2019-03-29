@@ -30,7 +30,7 @@ parser.add_argument('--g_steps', type=int, default=1, metavar='N',
                     help='steps of generator updates in one round of adverarial training (default: 1)')
 parser.add_argument('--d_steps', type=int, default=2, metavar='N',
                     help='steps of discriminator updates in one round of adverarial training (default: 3)')
-parser.add_argument('--gk_epochs', type=int, default=1, metavar='N',
+parser.add_argument('--gk_epochs', type=int, default=2, metavar='N',
                     help='epochs of generator updates in one step of generate update (default: 1)')
 parser.add_argument('--dk_epochs', type=int, default=2, metavar='N',
                     help='epochs of discriminator updates in one step of discriminator update (default: 3)')
@@ -324,7 +324,7 @@ if __name__ == '__main__':
         dis_adversarial_eval_acc.append(dis_acc)
         print("gen eval loss: {:.5f}, dis eval loss: {:.5f}, dis eval acc: {:.3f}\n"
             .format(gen_loss, dis_loss, dis_acc))
-
+    """
     # Save experiment data
     with open(args.data_path + 'experiment.pkl', 'wb') as f:
         pkl.dump(
@@ -342,3 +342,4 @@ if __name__ == '__main__':
             f,
             protocol=pkl.HIGHEST_PROTOCOL
         )
+    """
