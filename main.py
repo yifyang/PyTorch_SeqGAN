@@ -1,4 +1,5 @@
 import argparse
+import os
 import pickle as pkl
 
 import torch
@@ -24,7 +25,7 @@ parser.add_argument('--rounds', type=int, default=200, metavar='N',
                     help='rounds of adversarial training (default: 150)')
 parser.add_argument('--g_pretrain_steps', type=int, default=200, metavar='N',
                     help='steps of pre-training of generators (default: 120)')
-parser.add_argument('--d_pretrain_steps', type=int, default=60, metavar='N',
+parser.add_argument('--d_pretrain_steps', type=int, default=70, metavar='N',
                     help='steps of pre-training of discriminators (default: 50)')
 parser.add_argument('--g_steps', type=int, default=1, metavar='N',
                     help='steps of generator updates in one round of adverarial training (default: 1)')
@@ -57,7 +58,7 @@ parser.add_argument('--seed', type=int, default=1, metavar='S',
 # Files
 POSITIVE_FILE = 'self.data'
 NEGATIVE_FILE = 'gen_self.data'
-
+EPOCH_FILE = 'epoch_self.data' # store samples every epoch during adversarial training
 
 # Genrator Parameters
 g_embed_dim = 64
@@ -73,7 +74,7 @@ d_num_filters = [100, 200, 200, 200, 200, 100, 100, 100, 100, 100, 160, 160]
 d_dropout_prob = 0.2
 
 
-def generate_samples(model, batch_size, generated_num, output_file):
+def generate_samples(model, batch_size, generated_num, output_file, ad_train=False, EPOCH_FILE=''):
     samples = []
     for _ in range(int(generated_num / batch_size)):
         sample = model.sample(batch_size, g_seq_len).cpu().data.numpy().tolist()
@@ -84,6 +85,14 @@ def generate_samples(model, batch_size, generated_num, output_file):
             # fout.write('{}\n'.format(string))
             string = ' '.join([str(s) for s in sample])
             fout.write('%s\n' % string)
+    if ad_train:
+        with open(output_file, 'a') as fout:
+            for i, sample in enumerate(samples):
+                if i > 9: break
+                # string = ''.join([str(s) for s in sample])
+                # fout.write('{}\n'.format(string))
+                string = ' '.join([str(s) for s in sample])
+                fout.write('%s\n' % string)
 
 
 def train_generator_MLE(gen, data_iter, criterion, optimizer, epochs, 
@@ -236,6 +245,9 @@ if __name__ == '__main__':
         args.data_path = '../pytorch_SeqGAN/data_test/'
     POSITIVE_FILE = args.data_path + POSITIVE_FILE
     NEGATIVE_FILE = args.data_path + NEGATIVE_FILE
+    EPOCH_FILE = args.data_path + EPOCH_FILE
+    if os.path.exists(EPOCH_FILE):
+        os.remove(EPOCH_FILE)
 
     # Set models, criteria, optimizers
     generator = Generator(args.vocab_size, g_embed_dim, g_hidden_dim, args.cuda)
@@ -314,7 +326,7 @@ if __name__ == '__main__':
         adversarial_train(generator, discriminator, rollout, 
             pg_loss, nll_loss, gen_optimizer, dis_optimizer, 
             dis_adversarial_train_loss, dis_adversarial_train_acc, args)
-        generate_samples(generator, args.batch_size, args.n_samples, NEGATIVE_FILE)
+        generate_samples(generator, args.batch_size, args.n_samples, NEGATIVE_FILE, ad_train=True, EPOCH_FILE=EPOCH_FILE)
         gen_eval_iter = GenDataIter(NEGATIVE_FILE, args.batch_size)
         dis_eval_iter = DisDataIter(POSITIVE_FILE, NEGATIVE_FILE, args.batch_size)
         gen_loss = eval_generator(target_lstm, gen_eval_iter, nll_loss, args)
