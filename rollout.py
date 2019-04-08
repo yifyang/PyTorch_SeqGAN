@@ -14,7 +14,7 @@ class Rollout(object):
         self.own_model = copy.deepcopy(model)
         self.update_rate = update_rate
 
-    def get_reward(self, x, num, discriminator):
+    def get_reward(self, x, tgt_seq, tgt_pos, num, discriminator):
         """
         Inputs: x, num, discriminator
             - x: (batch_size, seq_len) input data
@@ -27,7 +27,8 @@ class Rollout(object):
         for i in range(num):
             for l in range(1, seq_len):
                 data = x[:, 0:l]
-                samples = self.own_model.sample(batch_size, seq_len, data)
+                # model.sample(tgt_seq, tgt_pos, len(tgt_seq), seq_len)
+                samples = self.own_model.sample(tgt_seq, tgt_pos, len(tgt_seq), seq_len, data)
                 pred = discriminator(samples, log=False)
                 pred = pred.cpu().data[:,1].numpy() - 0.5
                 if i == 0:

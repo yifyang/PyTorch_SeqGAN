@@ -1,22 +1,131 @@
 import torch
 import torch.nn as nn
 import torch.nn.functional as F
+import numpy as np
+import transformer.Constants as Constants
+from transformer.Layers import EncoderLayer, DecoderLayer
+
+def get_non_pad_mask(seq):
+    assert seq.dim() == 2
+    return seq.ne(Constants.PAD).type(torch.float).unsqueeze(-1)
+
+def get_sinusoid_encoding_table(n_position, d_hid, padding_idx=None):
+    ''' Sinusoid position encoding table '''
+
+    def cal_angle(position, hid_idx):
+        return position / np.power(10000, 2 * (hid_idx // 2) / d_hid)
+
+    def get_posi_angle_vec(position):
+        return [cal_angle(position, hid_j) for hid_j in range(d_hid)]
+
+    sinusoid_table = np.array([get_posi_angle_vec(pos_i) for pos_i in range(n_position)])
+
+    sinusoid_table[:, 0::2] = np.sin(sinusoid_table[:, 0::2])  # dim 2i
+    sinusoid_table[:, 1::2] = np.cos(sinusoid_table[:, 1::2])  # dim 2i+1
+
+    if padding_idx is not None:
+        # zero vector for padding dimension
+        sinusoid_table[padding_idx] = 0.
+
+    return torch.FloatTensor(sinusoid_table)
+
+def get_attn_key_pad_mask(seq_k, seq_q):
+    ''' For masking out the padding part of key sequence. '''
+
+    # Expand to fit the shape of key query attention matrix.
+    len_q = seq_q.size(1)
+    padding_mask = seq_k.eq(Constants.PAD)
+    padding_mask = padding_mask.unsqueeze(1).expand(-1, len_q, -1)  # b x lq x lk
+
+    return padding_mask
+
+def get_subsequent_mask(seq):
+    ''' For masking out the subsequent info. '''
+
+    sz_b, len_s = seq.size()
+    subsequent_mask = torch.triu(
+        torch.ones((len_s, len_s), device=seq.device, dtype=torch.uint8), diagonal=1)
+    subsequent_mask = subsequent_mask.unsqueeze(0).expand(sz_b, -1, -1)  # b x ls x ls
+
+    return subsequent_mask
+
+class Decoder(nn.Module):
+    ''' A decoder model with self attention mechanism. '''
+
+    def __init__(
+            self,
+            n_tgt_vocab, len_max_seq, d_word_vec,
+            n_layers, n_head, d_k, d_v,
+            d_model, d_inner, dropout=0.1):
+
+        super().__init__()
+        n_position = len_max_seq + 1
+
+        self.tgt_word_emb = nn.Embedding(
+            n_tgt_vocab, d_word_vec, padding_idx=Constants.PAD)
+
+        self.position_enc = nn.Embedding.from_pretrained(
+            get_sinusoid_encoding_table(n_position, d_word_vec, padding_idx=0),
+            freeze=True)
+
+        self.layer_stack = nn.ModuleList([
+            DecoderLayer(d_model, d_inner, n_head, d_k, d_v, dropout=dropout)
+            for _ in range(n_layers)])
+
+    def forward(self, tgt_seq, tgt_pos, src_seq, enc_output, return_attns=False):
+
+        dec_slf_attn_list, dec_enc_attn_list = [], []
+
+        # -- Prepare masks
+        non_pad_mask = get_non_pad_mask(tgt_seq)
+
+        slf_attn_mask_subseq = get_subsequent_mask(tgt_seq)
+        slf_attn_mask_keypad = get_attn_key_pad_mask(seq_k=tgt_seq, seq_q=tgt_seq)
+        slf_attn_mask = (slf_attn_mask_keypad + slf_attn_mask_subseq).gt(0)
+
+        dec_enc_attn_mask = get_attn_key_pad_mask(seq_k=src_seq, seq_q=tgt_seq)
+
+        # -- Forward
+        dec_output = self.tgt_word_emb(tgt_seq) + self.position_enc(tgt_pos)
+
+        for dec_layer in self.layer_stack:
+            dec_output, dec_slf_attn, dec_enc_attn = dec_layer(
+                dec_output, enc_output,
+                non_pad_mask=non_pad_mask,
+                slf_attn_mask=slf_attn_mask,
+                dec_enc_attn_mask=dec_enc_attn_mask)
+
+            if return_attns:
+                dec_slf_attn_list += [dec_slf_attn]
+                dec_enc_attn_list += [dec_enc_attn]
+
+        if return_attns:
+            return dec_output, dec_slf_attn_list, dec_enc_attn_list
+        return dec_output,
 
 
 class Generator(nn.Module):
     """ Generator """
 
-    def __init__(self, vocab_size, embedding_dim, hidden_dim, use_cuda):
+    def __init__(self, vocab_size, embedding_dim, use_cuda, len_max_seq=20,
+            d_model=512, d_inner=2048,
+            n_layers=6, n_head=8, d_k=64, d_v=64,
+            dropout=0.1):
         super(Generator, self).__init__()
-        self.hidden_dim = hidden_dim
+        self.d_model = d_model
         self.use_cuda = use_cuda
-        self.embed = nn.Embedding(vocab_size, embedding_dim)
-        self.lstm = nn.LSTM(embedding_dim, hidden_dim, batch_first=True)
-        self.fc = nn.Linear(hidden_dim, vocab_size)
+        # self.embed = nn.Embedding(vocab_size, embedding_dim)
+        # self.lstm = nn.LSTM(embedding_dim, hidden_dim, batch_first=True)
+        self.attention_decoder = Decoder(
+            n_tgt_vocab=vocab_size, len_max_seq=len_max_seq,
+            d_word_vec=embedding_dim, d_model=d_model, d_inner=d_inner,
+            n_layers=n_layers, n_head=n_head, d_k=d_k, d_v=d_v,
+            dropout=dropout)
+        self.fc = nn.Linear(d_model, vocab_size)
         self.log_softmax = nn.LogSoftmax(dim=1)
-        self.init_params()
+        # self.init_params()
 
-    def forward(self, x):
+    def forward(self, tgt_seq, tgt_pos, x):
         """
         Embeds input and applies LSTM on the input sequence.
 
@@ -25,14 +134,14 @@ class Generator(nn.Module):
         Outputs: out
             - out: (batch_size * seq_len, vocab_size), lstm output prediction
         """
-        self.lstm.flatten_parameters()
-        h0, c0 = self.init_hidden(x.size(0))
-        emb = self.embed(x) # batch_size * seq_len * emb_dim 
-        out, _ = self.lstm(emb, (h0, c0)) # out: batch_size * seq_len * hidden_dim
-        out = self.log_softmax(self.fc(out.contiguous().view(-1, self.hidden_dim))) # (batch_size*seq_len) * vocab_size
+        # self.lstm.flatten_parameters()
+        # h0, c0 = self.init_hidden(x.size(0))
+        # emb = self.embed(x) # batch_size * seq_len * emb_dim
+        out = self.attention_decoder(tgt_seq, tgt_pos, x) # out: batch_size * seq_len * hidden_dim
+        out = self.log_softmax(self.fc(out.contiguous().view(-1, self.d_model))) # (batch_size*seq_len) * vocab_size
         return out
 
-    def step(self, x, h, c):
+    def step(self, tgt_seq, tgt_pos, x):
         """
         Embeds input and applies LSTM one token at a time (seq_len = 1).
 
@@ -45,11 +154,11 @@ class Generator(nn.Module):
             - h: (1, batch_size, hidden_dim), lstm hidden state
             - c: (1, batch_size, hidden_dim), lstm cell state 
         """
-        self.lstm.flatten_parameters()
-        emb = self.embed(x) # batch_size * 1 * emb_dim
-        out, (h, c) = self.lstm(emb, (h, c)) # out: batch_size * 1 * hidden_dim
-        out = self.log_softmax(self.fc(out.contiguous().view(-1, self.hidden_dim))) # batch_size * vocab_size
-        return out, h, c
+        # self.lstm.flatten_parameters()
+        # emb = self.embed(x) # batch_size * 1 * emb_dim
+        out = self.attention_decoder(tgt_seq, tgt_pos, x) # out: batch_size * 1 * hidden_dim
+        out = self.log_softmax(self.fc(out.contiguous().view(-1, self.d_model))) # batch_size * vocab_size
+        return out
 
     def init_hidden(self, batch_size):
         h = torch.zeros(1, batch_size, self.hidden_dim)
@@ -62,7 +171,7 @@ class Generator(nn.Module):
         for param in self.parameters():
             param.data.uniform_(-0.05, 0.05)
 
-    def sample(self, batch_size, seq_len, x=None):
+    def sample(self, batch_size, seq_len, tgt_seq, tgt_pos, x=None):
         """
         Samples the network and returns a batch of samples of length seq_len.
 
@@ -71,12 +180,12 @@ class Generator(nn.Module):
         """
         samples = []
         if x is None:
-            h, c = self.init_hidden(batch_size)
+            # h, c = self.init_hidden(batch_size)
             x = torch.zeros(batch_size, 1, dtype=torch.int64)
             if self.use_cuda:
                 x = x.cuda()
             for _ in range(seq_len):
-                out, h, c = self.step(x, h, c)
+                out = self.step(tgt_seq, tgt_pos, x)
                 prob = torch.exp(out)
                 x = torch.multinomial(prob, 1) # select the next word with largest probability
                 samples.append(x)
@@ -85,13 +194,13 @@ class Generator(nn.Module):
             given_len = x.size(1)
             lis = x.chunk(x.size(1), dim=1)
             for i in range(given_len):
-                out, h, c = self.step(lis[i], h, c)
+                out = self.step(tgt_seq, tgt_pos, lis[i])
                 samples.append(lis[i])
             prob = torch.exp(out)
             x = torch.multinomial(prob, 1)
             for _ in range(given_len, seq_len):
                 samples.append(x)
-                out, h, c = self.step(x, h, c)
+                out = self.step(tgt_seq, tgt_pos, x)
                 prob = torch.exp(out)
                 x = torch.multinomial(prob, 1)
         out = torch.cat(samples, dim=1) # along the batch_size dimension

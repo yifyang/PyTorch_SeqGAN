@@ -150,7 +150,7 @@ class Decoder(nn.Module):
 
         if return_attns:
             return dec_output, dec_slf_attn_list, dec_enc_attn_list
-        return dec_output,
+        return dec_output
 
 class Transformer(nn.Module):
     ''' A sequence to sequence model with attention mechanism. '''
@@ -160,18 +160,18 @@ class Transformer(nn.Module):
             n_src_vocab, n_tgt_vocab, len_max_seq,
             d_word_vec=512, d_model=512, d_inner=2048,
             n_layers=6, n_head=8, d_k=64, d_v=64, dropout=0.1,
-            tgt_emb_prj_weight_sharing=True,
-            emb_src_tgt_weight_sharing=True):
+            tgt_emb_prj_weight_sharing=False,
+            emb_src_tgt_weight_sharing=False):
 
         super().__init__()
 
-        self.encoder = Encoder(
-            n_src_vocab=n_src_vocab, len_max_seq=len_max_seq,
-            d_word_vec=d_word_vec, d_model=d_model, d_inner=d_inner,
-            n_layers=n_layers, n_head=n_head, d_k=d_k, d_v=d_v,
-            dropout=dropout)
-
-        self.decoder = Decoder(
+        # self.encoder = Encoder(
+        #     n_src_vocab=n_src_vocab, len_max_seq=len_max_seq,
+        #     d_word_vec=d_word_vec, d_model=d_model, d_inner=d_inner,
+        #     n_layers=n_layers, n_head=n_head, d_k=d_k, d_v=d_v,
+        #     dropout=dropout)
+        self.d_model = d_model
+        self.decoder = myDecoder(
             n_tgt_vocab=n_tgt_vocab, len_max_seq=len_max_seq,
             d_word_vec=d_word_vec, d_model=d_model, d_inner=d_inner,
             n_layers=n_layers, n_head=n_head, d_k=d_k, d_v=d_v,
@@ -199,10 +199,100 @@ class Transformer(nn.Module):
 
     def forward(self, src_seq, src_pos, tgt_seq, tgt_pos):
 
-        # tgt_seq, tgt_pos = tgt_seq[:, :-1], tgt_pos[:, :-1]
+        tgt_seq, tgt_pos = tgt_seq[:, :-1], tgt_pos[:, :-1]
 
-        enc_output, *_ = self.encoder(src_seq, src_pos)
-        dec_output, *_ = self.decoder(tgt_seq, tgt_pos, src_seq, enc_output)
-        seq_logit = self.tgt_word_prj(dec_output) * self.x_logit_scale
+        # enc_output, *_ = self.encoder(src_seq, src_pos)
+        dec_output = self.decoder(tgt_seq, tgt_pos, src_seq)
+        out = self.tgt_word_prj(dec_output.contiguous().view(-1, self.d_model)) * self.x_logit_scale
 
-        return seq_logit.view(-1, seq_logit.size(2))
+        return out
+
+    def step(self, src_seq, tgt_seq, tgt_pos):
+        tgt_seq, tgt_pos = tgt_seq[:, :-1], tgt_pos[:, :-1]
+
+        dec_output = self.decoder(tgt_seq, tgt_pos, src_seq)
+        out = self.tgt_word_prj(dec_output.contiguous().view(-1, self.d_model)) * self.x_logit_scale
+
+        return out
+
+    def sample(self, tgt_seq, tgt_pos, batch_size, seq_len, x=None):
+        samples = []
+        if x is None:
+            # h, c = self.init_hidden(batch_size)
+            x = torch.zeros(batch_size, 1, dtype=torch.int64)
+            if tgt_seq.is_cuda:
+                x = x.cuda()
+            for _ in range(seq_len):
+                out = self.step(x, tgt_seq, tgt_pos)
+                prob = torch.exp(out)
+                x = torch.multinomial(prob, 1)  # select the next word with largest probability
+                samples.append(x)
+        else:
+            # h, c = self.init_hidden(x.size(0))
+            given_len = x.size(1)
+            lis = x.chunk(x.size(1), dim=1)
+            for i in range(given_len):
+                out = self.step(lis[i], tgt_seq, tgt_pos)
+                samples.append(lis[i])
+            prob = torch.exp(out)
+            x = torch.multinomial(prob, 1)
+            for _ in range(given_len, seq_len):
+                samples.append(x)
+                out = self.step(x, tgt_seq, tgt_pos)
+                prob = torch.exp(out)
+                x = torch.multinomial(prob, 1)
+        out = torch.cat(samples, dim=1)  # along the batch_size dimension
+        return out
+
+class myDecoder(nn.Module):
+    ''' A decoder model with self attention mechanism. '''
+
+    def __init__(
+            self,
+            n_tgt_vocab, len_max_seq, d_word_vec,
+            n_layers, n_head, d_k, d_v,
+            d_model, d_inner, dropout=0.1):
+
+        super().__init__()
+        n_position = len_max_seq + 1
+
+        self.tgt_word_emb = nn.Embedding(
+            n_tgt_vocab, d_word_vec, padding_idx=Constants.PAD)
+
+        self.position_enc = nn.Embedding.from_pretrained(
+            get_sinusoid_encoding_table(n_position, d_word_vec, padding_idx=0),
+            freeze=True)
+
+        self.layer_stack = nn.ModuleList([
+            DecoderLayer(d_model, d_inner, n_head, d_k, d_v, dropout=dropout)
+            for _ in range(n_layers)])
+
+
+    def forward(self, tgt_seq, tgt_pos, x, return_attns=False):
+
+        dec_slf_attn_list, dec_enc_attn_list = [], []
+
+        # -- Prepare masks
+        non_pad_mask = get_non_pad_mask(tgt_seq)
+
+        slf_attn_mask_subseq = get_subsequent_mask(tgt_seq)
+        slf_attn_mask_keypad = get_attn_key_pad_mask(seq_k=tgt_seq, seq_q=tgt_seq)
+        slf_attn_mask = (slf_attn_mask_keypad + slf_attn_mask_subseq).gt(0)
+
+        # dec_enc_attn_mask = get_attn_key_pad_mask(seq_k=src_seq, seq_q=tgt_seq)
+
+        # -- Forward
+        dec_output = self.tgt_word_emb(tgt_seq) + self.position_enc(tgt_pos)
+
+        for dec_layer in self.layer_stack:
+            dec_output, dec_slf_attn = dec_layer(
+                dec_output, non_pad_mask=non_pad_mask,
+                slf_attn_mask=slf_attn_mask)
+
+            if return_attns:
+                dec_slf_attn_list += [dec_slf_attn]
+                # dec_enc_attn_list += [dec_enc_attn]
+
+        if return_attns:
+            return dec_output, dec_slf_attn_list
+        return dec_output
