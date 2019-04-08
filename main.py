@@ -384,7 +384,7 @@ if __name__ == '__main__':
         # train_generator_MLE(generator, gen_data_iter, nll_loss,
         #     gen_optimizer, args.gk_epochs, gen_pretrain_train_loss, args)
         generate_samples(generator, gen_data_iter, args, NEGATIVE_FILE)
-        eval_iter = GenDataIter(NEGATIVE_FILE, args.batch_size)
+        eval_iter = prepare_dataloaders(NEGATIVE_FILE, args.batch_size)
         gen_loss = eval_generator(target_lstm, eval_iter, nll_loss, args)
         gen_pretrain_eval_loss.append(gen_loss)
         print("eval loss: {:.5f}\n".format(gen_loss))
@@ -421,7 +421,7 @@ if __name__ == '__main__':
         # generate_samples(generator, args.batch_size, args.n_samples, NEGATIVE_FILE, ad_train=True, epoch_file=EPOCH_FILE)
         generate_samples(generator, gen_data_iter, args, NEGATIVE_FILE)
 
-        gen_eval_iter = GenDataIter(NEGATIVE_FILE, args.batch_size)
+        gen_eval_iter = prepare_dataloaders(NEGATIVE_FILE, args.batch_size)
         dis_eval_iter = DisDataIter(POSITIVE_FILE, NEGATIVE_FILE, args.batch_size)
         gen_loss = eval_generator(target_lstm, gen_eval_iter, nll_loss, args)
         gen_adversarial_eval_loss.append(gen_loss)
