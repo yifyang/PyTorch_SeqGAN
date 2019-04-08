@@ -231,7 +231,7 @@ def eval_generator(model, data_iter, criterion, args):
                 src_seq, src_pos, tgt_seq, tgt_pos = map(lambda x: x.cuda(), batch)
             else:
                 src_seq, src_pos, tgt_seq, tgt_pos = map(lambda x: x.cpu(), batch)
-            target = target.contiguous().view(-1)
+            tgt_seq = tgt_seq.contiguous().view(-1)
             pred = model(src_seq)
             loss = criterion(pred, tgt_seq)
             total_loss += loss.item()
