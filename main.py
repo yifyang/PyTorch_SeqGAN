@@ -58,15 +58,15 @@ parser.add_argument('--no_cuda', action='store_true', default=False,
                     help='disables CUDA training')
 parser.add_argument('--seed', type=int, default=1, metavar='S',
                     help='random seed (default: 1)')
-parser.add_argument('--seq_len', type=int, default=10, metavar='S',
+parser.add_argument('--seq_len', type=int, default=12, metavar='S',
                     help='random seed (default: 10)')
 
 
 # Files
-POSITIVE_FILE = 'news.data'
-NEGATIVE_FILE = 'gen_news.data'
+POSITIVE_FILE = 'news_12.data'
+NEGATIVE_FILE = 'gen_news_12.data'
 # RANDOM_FILE = 'self_num_rand.data'
-EPOCH_FILE = 'epoch_self.data' # store samples every epoch during adversarial training
+EPOCH_FILE = 'epoch_self_12.data' # store samples every epoch during adversarial training
 
 
 # Genrator Parameters
