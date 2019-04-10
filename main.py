@@ -44,12 +44,12 @@ parser.add_argument('--update_rate', type=float, default=0.8, metavar='UR',
                     help='update rate of roll-out model (default: 0.8)')
 parser.add_argument('--n_rollout', type=int, default=16, metavar='N',
                     help='number of roll-out (default: 16)')
-parser.add_argument('--vocab_size', type=int, default=7521, metavar='N',
-                    help='vocabulary size (default: 28261)')
+parser.add_argument('--vocab_size', type=int, default=20, metavar='N',
+                    help='vocabulary size (default: 28261, 7521)')
 parser.add_argument('--batch_size', type=int, default=64, metavar='N',
                     help='batch size (default: 64)')
-parser.add_argument('--n_samples', type=int, default=3317, metavar='N',
-                    help='number of samples gerenated per time (default: 35094)')
+parser.add_argument('--n_samples', type=int, default=6400, metavar='N',
+                    help='number of samples gerenated per time (default: 35094, 3317)')
 parser.add_argument('--gen_lr', type=float, default=1e-3, metavar='LR',
                     help='learning rate of generator optimizer (default: 1e-3)')
 parser.add_argument('--dis_lr', type=float, default=1e-3, metavar='LR',
@@ -58,19 +58,19 @@ parser.add_argument('--no_cuda', action='store_true', default=False,
                     help='disables CUDA training')
 parser.add_argument('--seed', type=int, default=1, metavar='S',
                     help='random seed (default: 1)')
-parser.add_argument('--seq_len', type=int, default=12, metavar='S',
+parser.add_argument('--seq_len', type=int, default=20, metavar='S',
                     help='random seed (default: 10)')
 
 
 # Files
-POSITIVE_FILE = 'news_12.data'
-NEGATIVE_FILE = 'gen_news_12.data'
+POSITIVE_FILE = 'self.data'
+NEGATIVE_FILE = 'gen_self.data'
 # RANDOM_FILE = 'self_num_rand.data'
 EPOCH_FILE = 'epoch_self_12.data' # store samples every epoch during adversarial training
 
 
 # Genrator Parameters
-g_embed_dim = 512
+g_embed_dim = 128
 g_hidden_dim = 32
 # g_hidden_layer = 3
 # g_seq_len = 20
@@ -79,11 +79,11 @@ g_hidden_dim = 32
 # Discriminator Parameters
 d_num_class = 2
 d_embed_dim = 64
-# d_filter_sizes = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 15, 20]
-d_filter_sizes = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 12]
+d_filter_sizes = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 15, 20]
+# d_filter_sizes = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 12]
 # d_filter_sizes = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10]
-# d_num_filters = [100, 200, 200, 200, 200, 100, 100, 100, 100, 100, 160, 160]
-d_num_filters = [100, 200, 200, 200, 200, 100, 100, 100, 100, 100, 160]
+d_num_filters = [100, 200, 200, 200, 200, 100, 100, 100, 100, 100, 160, 160]
+# d_num_filters = [100, 200, 200, 200, 200, 100, 100, 100, 100, 100, 160]
 # d_num_filters = [100, 200, 200, 200, 200, 100, 100, 100, 100, 100]
 d_dropout_prob = 0.2
 
@@ -392,7 +392,7 @@ if __name__ == '__main__':
         gen_pretrain_eval_loss.append(gen_loss)
         print("eval loss: {:.5f}\n".format(gen_loss))
     print('#####################################################\n\n')
-    
+
     # Pre-train discriminator
     print('#####################################################')
     print('Start pre-training discriminator...')
