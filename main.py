@@ -372,7 +372,7 @@ if __name__ == '__main__':
     # print('Generating data ...')
     # print('#####################################################\n\n')
     # generate_samples(target_lstm, args.batch_size, args.n_samples, POSITIVE_FILE)
-    """
+
     # Pre-train generator using MLE
     print('#####################################################')
     print('Start pre-training generator with MLE...')
@@ -380,7 +380,7 @@ if __name__ == '__main__':
 
     # gen_data_iter = GenDataIter(POSITIVE_FILE, args.batch_size)
     gen_data_iter = prepare_dataloaders(POSITIVE_FILE, args.batch_size)
-
+    """
     for i in range(args.g_pretrain_steps):
         print("G-Step {}".format(i))
         train_generator_MLE(generator, gen_data_iter, nll_loss,
