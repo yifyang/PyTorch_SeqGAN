@@ -381,7 +381,7 @@ if __name__ == '__main__':
 
     # gen_data_iter = GenDataIter(POSITIVE_FILE, args.batch_size)
     gen_data_iter = prepare_dataloaders(POSITIVE_FILE, args.batch_size)
-    """
+
     for i in range(args.g_pretrain_steps):
         print("G-Step {}".format(i))
         train_generator_MLE(generator, gen_data_iter, nll_loss,
@@ -392,7 +392,7 @@ if __name__ == '__main__':
         gen_pretrain_eval_loss.append(gen_loss)
         print("eval loss: {:.5f}\n".format(gen_loss))
     print('#####################################################\n\n')
-    """
+    
     # Pre-train discriminator
     print('#####################################################')
     print('Start pre-training discriminator...')
