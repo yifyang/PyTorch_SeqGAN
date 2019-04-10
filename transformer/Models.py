@@ -158,7 +158,7 @@ class Transformer(nn.Module):
     def __init__(
             self,
             n_src_vocab, n_tgt_vocab, len_max_seq,
-            d_word_vec=128, d_model=128, d_inner=496,
+            d_word_vec=512, d_model=512, d_inner=2048,
             n_layers=6, n_head=8, d_k=64, d_v=64, dropout=0.1,
             tgt_emb_prj_weight_sharing=False,
             emb_src_tgt_weight_sharing=False):
@@ -288,10 +288,12 @@ class myDecoder(nn.Module):
         super().__init__()
         n_position = len_max_seq + 1
 
-        self.tgt_word_emb = nn.Embedding(
-            n_tgt_vocab, d_word_vec, padding_idx=Constants.PAD)
+        # self.tgt_word_emb = nn.Embedding(
+        #     n_tgt_vocab, d_word_vec, padding_idx=Constants.PAD)
 
         self.tgt_word_emb = nn.Embedding(n_tgt_vocab, d_word_vec)
+
+        # self.tgt_word_emb = nn.Embedding(n_tgt_vocab, d_word_vec)
 
         self.position_enc = nn.Embedding.from_pretrained(
             get_sinusoid_encoding_table(n_position, d_word_vec, padding_idx=0),
