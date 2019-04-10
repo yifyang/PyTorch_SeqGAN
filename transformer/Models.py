@@ -223,6 +223,8 @@ class Transformer(nn.Module):
             x = torch.ones(batch_size, 1, dtype=torch.int64)
             tgt_seq_part = tgt_seq[:, :given_len+1]
             tgt_pos_part = tgt_pos[:, :given_len+1]
+            if tgt_seq.is_cuda:
+                x = x.cuda()
             out = self.step(x, tgt_seq_part, tgt_pos_part)
             sample = (out.max(1)[1]).resize(batch_size, given_len+1)
             samples.append(sample)
