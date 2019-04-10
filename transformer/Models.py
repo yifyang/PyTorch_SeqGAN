@@ -227,10 +227,11 @@ class Transformer(nn.Module):
                 x = x.cuda()
             out = self.step(x, tgt_seq_part, tgt_pos_part)
             sample = (out.max(1)[1]).resize(batch_size, given_len+1)
-            samples.append(sample)
+            # samples.append(sample)
             x = sample
 
         given_len = x.size(1)
+        samples.append(x)
 
         for i in range(given_len, seq_len):
             # pad = torch.zeros(batch_size, 1, dtype=torch.int64)

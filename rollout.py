@@ -29,7 +29,6 @@ class Rollout(object):
                 data = x[:, 0:l]
                 # model.sample(tgt_seq, tgt_pos, len(tgt_seq), seq_len)
                 samples = self.own_model.sample(tgt_seq, tgt_pos, len(tgt_seq), seq_len, data)
-                print(samples.is_cuda)
                 pred = discriminator(samples, log=False)
                 pred = pred.cpu().data[:,1].numpy() - 0.5
                 if i == 0:
