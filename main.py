@@ -372,7 +372,7 @@ if __name__ == '__main__':
     # print('Generating data ...')
     # print('#####################################################\n\n')
     # generate_samples(target_lstm, args.batch_size, args.n_samples, POSITIVE_FILE)
-
+    """
     # Pre-train generator using MLE
     print('#####################################################')
     print('Start pre-training generator with MLE...')
@@ -408,7 +408,7 @@ if __name__ == '__main__':
         dis_pretrain_eval_acc.append(dis_acc)
         print("eval loss: {:.5f}, eval acc: {:.3f}\n".format(dis_loss, dis_acc))
     print('#####################################################\n\n')
-
+    """
     # Adversarial training
     print('#####################################################')
     print('Start adversarial training...')
