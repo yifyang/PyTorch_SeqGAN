@@ -78,7 +78,7 @@ g_hidden_dim = 32
 
 # Discriminator Parameters
 d_num_class = 2
-d_embed_dim = 64
+d_embed_dim = 128
 d_filter_sizes = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 15, 20]
 # d_filter_sizes = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 12]
 # d_filter_sizes = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10]
