@@ -28,9 +28,9 @@ parser.add_argument('--data_path', type=str, default='dataset/', metavar='PATH',
                     help='data path to save files (default: dataset/)')
 parser.add_argument('--rounds', type=int, default=200, metavar='N',
                     help='rounds of adversarial training (default: 150)')
-parser.add_argument('--g_pretrain_steps', type=int, default=130, metavar='N',
+parser.add_argument('--g_pretrain_steps', type=int, default=200, metavar='N',
                     help='steps of pre-training of generators (default: 120)')
-parser.add_argument('--d_pretrain_steps', type=int, default=70, metavar='N',
+parser.add_argument('--d_pretrain_steps', type=int, default=50, metavar='N',
                     help='steps of pre-training of discriminators (default: 50)')
 parser.add_argument('--g_steps', type=int, default=1, metavar='N',
                     help='steps of generator updates in one round of adverarial training (default: 1)')
@@ -380,7 +380,7 @@ if __name__ == '__main__':
 
     # gen_data_iter = GenDataIter(POSITIVE_FILE, args.batch_size)
     gen_data_iter = prepare_dataloaders(POSITIVE_FILE, args.batch_size)
-    """
+
     for i in range(args.g_pretrain_steps):
         print("G-Step {}".format(i))
         train_generator_MLE(generator, gen_data_iter, nll_loss,
@@ -408,7 +408,7 @@ if __name__ == '__main__':
         dis_pretrain_eval_acc.append(dis_acc)
         print("eval loss: {:.5f}, eval acc: {:.3f}\n".format(dis_loss, dis_acc))
     print('#####################################################\n\n')
-    """
+
     # Adversarial training
     print('#####################################################')
     print('Start adversarial training...')
