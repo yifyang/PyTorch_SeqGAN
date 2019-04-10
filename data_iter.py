@@ -137,8 +137,7 @@ def collate_fn(insts):
     batch_seq = np.array([list(inst) for inst in insts])
 
     batch_pos = np.array([
-        [pos_i+1 if w_i != Constants.PAD else 0
-         for pos_i, w_i in enumerate(inst)] for inst in batch_seq])
+        [pos_i+1 for pos_i, w_i in enumerate(inst)] for inst in batch_seq])
 
     batch_seq = torch.LongTensor(batch_seq)
     batch_pos = torch.LongTensor(batch_pos)

@@ -158,7 +158,7 @@ class Transformer(nn.Module):
     def __init__(
             self,
             n_src_vocab, n_tgt_vocab, len_max_seq,
-            d_word_vec=512, d_model=512, d_inner=2048,
+            d_word_vec=128, d_model=128, d_inner=496,
             n_layers=6, n_head=8, d_k=64, d_v=64, dropout=0.1,
             tgt_emb_prj_weight_sharing=False,
             emb_src_tgt_weight_sharing=False):
@@ -179,6 +179,7 @@ class Transformer(nn.Module):
 
         self.tgt_word_prj = nn.Linear(d_model, n_tgt_vocab, bias=False)
         nn.init.xavier_normal_(self.tgt_word_prj.weight)
+        self.log_softmax = nn.LogSoftmax(dim=1)
 
         assert d_model == d_word_vec, \
         'To facilitate the residual connections, \
@@ -208,15 +209,43 @@ class Transformer(nn.Module):
         return out
 
     def step(self, src_seq, tgt_seq, tgt_pos):
-        tgt_seq, tgt_pos = tgt_seq[:, :-1], tgt_pos[:, :-1]
+        # tgt_seq, tgt_pos = tgt_seq[:, :-1], tgt_pos[:, :-1]
 
         dec_output = self.decoder(tgt_seq, tgt_pos, src_seq)
         out = self.tgt_word_prj(dec_output.contiguous().view(-1, self.d_model)) * self.x_logit_scale
-
+        # out = self.log_softmax(dec_output)
         return out
 
     def sample(self, tgt_seq, tgt_pos, batch_size, seq_len, x=None):
         samples = []
+        if x is None:
+            given_len = 0
+            x = torch.ones(batch_size, 1, dtype=torch.int64)
+            tgt_seq_part = tgt_seq[:, :given_len+1]
+            tgt_pos_part = tgt_pos[:, :given_len+1]
+            out = self.step(x, tgt_seq_part, tgt_pos_part)
+            sample = (out.max(1)[1]).resize(batch_size, given_len+1)
+            samples.append(sample)
+            x = sample
+
+        given_len = x.size(1)
+
+        for i in range(given_len, seq_len):
+            # pad = torch.zeros(batch_size, 1, dtype=torch.int64)
+            # x = torch.cat((x, pad), dim=1)
+            tgt_seq_part = tgt_seq[:, :i+1]
+            tgt_pos_part = tgt_pos[:, :i+1]
+            out = self.step(x, tgt_seq_part, tgt_pos_part)
+            sample = (out.max(1)[1]).resize(batch_size, i+1)
+            token = sample[:, -1:]
+            samples.append(token)
+            x = torch.cat((x, token), dim=1)
+
+
+        samples_cat = torch.cat(samples, dim=1)
+        return samples_cat
+
+        """
         if x is None:
             # h, c = self.init_hidden(batch_size)
             x = torch.zeros(batch_size, 1, dtype=torch.int64)
@@ -243,6 +272,7 @@ class Transformer(nn.Module):
                 x = torch.multinomial(prob, 1)
         out = torch.cat(samples, dim=1)  # along the batch_size dimension
         return out
+        """
 
 class myDecoder(nn.Module):
     ''' A decoder model with self attention mechanism. '''
@@ -259,6 +289,8 @@ class myDecoder(nn.Module):
         self.tgt_word_emb = nn.Embedding(
             n_tgt_vocab, d_word_vec, padding_idx=Constants.PAD)
 
+        self.tgt_word_emb = nn.Embedding(n_tgt_vocab, d_word_vec)
+
         self.position_enc = nn.Embedding.from_pretrained(
             get_sinusoid_encoding_table(n_position, d_word_vec, padding_idx=0),
             freeze=True)
@@ -274,20 +306,24 @@ class myDecoder(nn.Module):
 
         # -- Prepare masks
         non_pad_mask = get_non_pad_mask(tgt_seq)
+        # non_pad_mask = torch.cat((torch.ones(tgt_seq.size(0), x.size(1)-1, 1, dtype=torch.float),
+        #                           torch.zeros(tgt_seq.size(0), 1, 1, dtype=torch.float)), dim=1)
 
         slf_attn_mask_subseq = get_subsequent_mask(tgt_seq)
         slf_attn_mask_keypad = get_attn_key_pad_mask(seq_k=tgt_seq, seq_q=tgt_seq)
         slf_attn_mask = (slf_attn_mask_keypad + slf_attn_mask_subseq).gt(0)
 
-        # dec_enc_attn_mask = get_attn_key_pad_mask(seq_k=src_seq, seq_q=tgt_seq)
+        dec_enc_attn_mask = get_attn_key_pad_mask(seq_k=x, seq_q=tgt_seq)
 
         # -- Forward
         dec_output = self.tgt_word_emb(tgt_seq) + self.position_enc(tgt_pos)
+        x = self.tgt_word_emb(x)
 
         for dec_layer in self.layer_stack:
             dec_output, dec_slf_attn = dec_layer(
-                dec_output, non_pad_mask=non_pad_mask,
-                slf_attn_mask=slf_attn_mask)
+                dec_output, x,
+                slf_attn_mask=slf_attn_mask,
+                dec_enc_attn_mask=dec_enc_attn_mask)
 
             if return_attns:
                 dec_slf_attn_list += [dec_slf_attn]

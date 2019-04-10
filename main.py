@@ -28,7 +28,7 @@ parser.add_argument('--data_path', type=str, default='dataset/', metavar='PATH',
                     help='data path to save files (default: dataset/)')
 parser.add_argument('--rounds', type=int, default=200, metavar='N',
                     help='rounds of adversarial training (default: 150)')
-parser.add_argument('--g_pretrain_steps', type=int, default=200, metavar='N',
+parser.add_argument('--g_pretrain_steps', type=int, default=130, metavar='N',
                     help='steps of pre-training of generators (default: 120)')
 parser.add_argument('--d_pretrain_steps', type=int, default=70, metavar='N',
                     help='steps of pre-training of discriminators (default: 50)')
@@ -44,11 +44,11 @@ parser.add_argument('--update_rate', type=float, default=0.8, metavar='UR',
                     help='update rate of roll-out model (default: 0.8)')
 parser.add_argument('--n_rollout', type=int, default=16, metavar='N',
                     help='number of roll-out (default: 16)')
-parser.add_argument('--vocab_size', type=int, default=28261, metavar='N',
+parser.add_argument('--vocab_size', type=int, default=20, metavar='N',
                     help='vocabulary size (default: 28261)')
 parser.add_argument('--batch_size', type=int, default=64, metavar='N',
                     help='batch size (default: 64)')
-parser.add_argument('--n_samples', type=int, default=35094, metavar='N',
+parser.add_argument('--n_samples', type=int, default=6400, metavar='N',
                     help='number of samples gerenated per time (default: 35094)')
 parser.add_argument('--gen_lr', type=float, default=1e-3, metavar='LR',
                     help='learning rate of generator optimizer (default: 1e-3)')
@@ -58,22 +58,22 @@ parser.add_argument('--no_cuda', action='store_true', default=False,
                     help='disables CUDA training')
 parser.add_argument('--seed', type=int, default=1, metavar='S',
                     help='random seed (default: 1)')
-parser.add_argument('--seq_len', type=int, default=12, metavar='S',
+parser.add_argument('--seq_len', type=int, default=20, metavar='S',
                     help='random seed (default: 10)')
 
 
 # Files
-POSITIVE_FILE = 'news_12.data'
-NEGATIVE_FILE = 'gen_news_12.data'
+POSITIVE_FILE = 'self.data'
+NEGATIVE_FILE = 'gen_self.data'
 # RANDOM_FILE = 'self_num_rand.data'
 EPOCH_FILE = 'epoch_self_12.data' # store samples every epoch during adversarial training
 
 
 # Genrator Parameters
-g_embed_dim = 512
+g_embed_dim = 128
 g_hidden_dim = 32
 # g_hidden_layer = 3
-g_seq_len = 10
+g_seq_len = 20
 
 
 # Discriminator Parameters
@@ -198,7 +198,8 @@ def train_generator_PG(gen, dis, gen_data_iter, rollout, pg_loss, optimizer, epo
 
         samples = generator.sample(tgt_seq, tgt_pos, len(tgt_seq), args.seq_len)
         zeros = torch.zeros(args.batch_size, 1, dtype=torch.int64)
-        if samples.is_cuda:
+        if args.cuda:
+            samples= samples.cuda()
             zeros = zeros.cuda()
         inputs = torch.cat([zeros, samples.data], dim = 1)[:, :-1].contiguous()
         targets = samples.data.contiguous().view((-1,))
