@@ -86,7 +86,7 @@ class Generator(nn.Module):
             lis = x.chunk(x.size(1), dim=1)
             for i in range(given_len):
                 out, h, c = self.step(lis[i], h, c)
-                samples.append(lis[i])
+                samples.append(lis[i])        # memorize the previous part of the sequence
             prob = torch.exp(out)
             x = torch.multinomial(prob, 1)
             for _ in range(given_len, seq_len):
