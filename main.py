@@ -201,7 +201,6 @@ def train_generator_PG(gen, dis, gen_data_iter, rollout, pg_loss, optimizer, epo
         samples = generator.sample(tgt_seq, tgt_pos, len(tgt_seq), args.seq_len)
         zeros = torch.zeros(args.batch_size, 1, dtype=torch.int64)
         if args.cuda:
-            samples= samples.cuda()
             zeros = zeros.cuda()
         inputs = torch.cat([zeros, samples.data], dim = 1)[:, :-1].contiguous()
         targets = samples.data.contiguous().view((-1,))

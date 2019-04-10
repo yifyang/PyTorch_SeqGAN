@@ -243,7 +243,8 @@ class Transformer(nn.Module):
             samples.append(token)
             x = torch.cat((x, token), dim=1)
 
-
+        if tgt_seq.is_cuda:
+            samples = samples.cuda()
         samples_cat = torch.cat(samples, dim=1)
         return samples_cat
 
