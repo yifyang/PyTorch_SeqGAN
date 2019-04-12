@@ -22,11 +22,11 @@ parser.add_argument('--hpc', action='store_true', default=True,
 parser.add_argument('--data_path', type=str, default='dataset/', metavar='PATH',
                     help='data path to save files (default: dataset/)')
 parser.add_argument('--rounds', type=int, default=200, metavar='N',
-                    help='rounds of adversarial training (default: 150)')
+                    help='rounds of adversarial training (default: 200)')
 parser.add_argument('--g_pretrain_steps', type=int, default=200, metavar='N',
-                    help='steps of pre-training of generators (default: 120)')
+                    help='steps of pre-training of generators (default: 200)')
 parser.add_argument('--d_pretrain_steps', type=int, default=70, metavar='N',
-                    help='steps of pre-training of discriminators (default: 50)')
+                    help='steps of pre-training of discriminators (default: 70)')
 parser.add_argument('--g_steps', type=int, default=1, metavar='N',
                     help='steps of generator updates in one round of adverarial training (default: 1)')
 parser.add_argument('--d_steps', type=int, default=2, metavar='N',
@@ -44,7 +44,7 @@ parser.add_argument('--vocab_size', type=int, default=20, metavar='N',
 parser.add_argument('--batch_size', type=int, default=64, metavar='N',
                     help='batch size (default: 64)')
 parser.add_argument('--n_samples', type=int, default=6400, metavar='N',
-                    help='number of samples gerenated per time (default: 10000)')
+                    help='number of samples gerenated per time (default: 6400)')
 parser.add_argument('--gen_lr', type=float, default=1e-3, metavar='LR',
                     help='learning rate of generator optimizer (default: 1e-3)')
 parser.add_argument('--dis_lr', type=float, default=1e-3, metavar='LR',
@@ -56,25 +56,25 @@ parser.add_argument('--seed', type=int, default=1, metavar='S',
 
 
 # Files
-POSITIVE_FILE = 'self.data'
-NEGATIVE_FILE = 'gen_self.data'
-EPOCH_FILE = 'epoch_self.data' # store samples every epoch during adversarial training
+POSITIVE_FILE = 'news.data'
+NEGATIVE_FILE = 'gen_news.data'
+EPOCH_FILE = 'epoch_news.data' # store samples every epoch during adversarial training
 
 
 # Genrator Parameters
-g_embed_dim = 64
-g_hidden_dim = 32
+g_embed_dim = 512    # default: 64
+g_hidden_dim = 256   # default:32
 # g_hidden_layer = 3
-g_seq_len = 20
+g_seq_len = 10
 
 
 # Discriminator Parameters
 d_num_class = 2
-d_embed_dim = 64
-d_filter_sizes = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 15, 20]
-# d_filter_sizes = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10]
-d_num_filters = [100, 200, 200, 200, 200, 100, 100, 100, 100, 100, 160, 160]
-# d_num_filters = [100, 200, 200, 200, 200, 100, 100, 100, 100, 100]
+d_embed_dim = 512  # default:64
+# d_filter_sizes = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 15, 20]
+d_filter_sizes = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10]
+# d_num_filters = [100, 200, 200, 200, 200, 100, 100, 100, 100, 100, 160, 160]
+d_num_filters = [100, 200, 200, 200, 200, 100, 100, 100, 100, 100]
 d_dropout_prob = 0.2
 
 
