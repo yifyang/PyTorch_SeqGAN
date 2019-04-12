@@ -39,11 +39,11 @@ parser.add_argument('--update_rate', type=float, default=0.8, metavar='UR',
                     help='update rate of roll-out model (default: 0.8)')
 parser.add_argument('--n_rollout', type=int, default=16, metavar='N',
                     help='number of roll-out (default: 16)')
-parser.add_argument('--vocab_size', type=int, default=28261, metavar='N',
+parser.add_argument('--vocab_size', type=int, default=20, metavar='N',
                     help='vocabulary size (default: 20)')
 parser.add_argument('--batch_size', type=int, default=64, metavar='N',
                     help='batch size (default: 64)')
-parser.add_argument('--n_samples', type=int, default=35094, metavar='N',
+parser.add_argument('--n_samples', type=int, default=6400, metavar='N',
                     help='number of samples gerenated per time (default: 6400)')
 parser.add_argument('--gen_lr', type=float, default=1e-3, metavar='LR',
                     help='learning rate of generator optimizer (default: 1e-3)')
@@ -56,25 +56,25 @@ parser.add_argument('--seed', type=int, default=1, metavar='S',
 
 
 # Files
-POSITIVE_FILE = 'news.data'
-NEGATIVE_FILE = 'gen_news.data'
-EPOCH_FILE = 'epoch_news.data' # store samples every epoch during adversarial training
+POSITIVE_FILE = 'self.data'
+NEGATIVE_FILE = 'gen_self.data'
+EPOCH_FILE = 'epoch_self.data' # store samples every epoch during adversarial training
 
 
 # Genrator Parameters
-g_embed_dim = 512    # default: 64
-g_hidden_dim = 256   # default:32
+g_embed_dim = 64    # default: 64
+g_hidden_dim = 32   # default:32
 # g_hidden_layer = 3
-g_seq_len = 10
+g_seq_len = 20
 
 
 # Discriminator Parameters
 d_num_class = 2
-d_embed_dim = 512  # default:64
-# d_filter_sizes = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 15, 20]
-d_filter_sizes = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10]
-# d_num_filters = [100, 200, 200, 200, 200, 100, 100, 100, 100, 100, 160, 160]
-d_num_filters = [100, 200, 200, 200, 200, 100, 100, 100, 100, 100]
+d_embed_dim = 64  # default:64
+d_filter_sizes = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 15, 20]
+# d_filter_sizes = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10]
+d_num_filters = [100, 200, 200, 200, 200, 100, 100, 100, 100, 100, 160, 160]
+# d_num_filters = [100, 200, 200, 200, 200, 100, 100, 100, 100, 100]
 d_dropout_prob = 0.2
 
 
@@ -289,7 +289,7 @@ if __name__ == '__main__':
     # print('Generating data ...')
     # print('#####################################################\n\n')
     # generate_samples(target_lstm, args.batch_size, args.n_samples, POSITIVE_FILE)
-
+    """
     # Pre-train generator using MLE
     print('#####################################################')
     print('Start pre-training generator with MLE...')
@@ -321,7 +321,7 @@ if __name__ == '__main__':
         dis_pretrain_eval_acc.append(dis_acc)
         print("eval loss: {:.5f}, eval acc: {:.3f}\n".format(dis_loss, dis_acc))
     print('#####################################################\n\n')
-
+    """
     # Adversarial training
     print('#####################################################')
     print('Start adversarial training...')
