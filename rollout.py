@@ -37,8 +37,8 @@ class Rollout(object):
                     rewards[l-1] += pred
 
             # for the last token
-            pred = discriminator(x)
-            pred = pred.cpu().data[:, 1].numpy()
+            pred = discriminator(x, log=False)
+            pred = pred.cpu().data[:, 1].numpy() - 0.5
             if i == 0:
                 rewards.append(pred)
             else:
