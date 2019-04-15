@@ -218,6 +218,40 @@ class Transformer(nn.Module):
 
     def sample(self, tgt_seq, tgt_pos, batch_size, seq_len, x=None):
         samples = []
+        # Third version
+        if x is None:
+            given_len = 0
+            x = torch.zeros(batch_size, 1, dtype=torch.int64)
+            tgt_seq_part = tgt_seq[:, given_len:given_len + 1]
+            tgt_pos_part = tgt_pos[:, given_len:given_len + 1]
+            if tgt_seq.is_cuda:
+                x = x.cuda()
+            out = self.step(x, tgt_seq_part, tgt_pos_part)
+            sample = (out.max(1)[1]).resize(batch_size, 1)
+            # samples.append(sample)
+            x = sample
+
+        given_len = x.size(1)
+        samples.append(x)
+
+        for i in range(given_len, seq_len):
+            # pad = torch.zeros(batch_size, 1, dtype=torch.int64)
+            # x = torch.cat((x, pad), dim=1)
+            tgt_seq_part = tgt_seq[:, i+1:i+2]
+            tgt_pos_part = tgt_pos[:, i+1:i+2]
+            out = self.step(x[:, i:i+1], tgt_seq_part, tgt_pos_part)
+            token = (out.max(1)[1]).resize(batch_size, 1)
+            # token = sample[:, -1:]
+            samples.append(token)
+            x = torch.cat((x, token), dim=1)
+
+        samples_cat = torch.cat(samples, dim=1)
+        if tgt_seq.is_cuda:
+            samples_cat = samples_cat.cuda()
+        return samples_cat
+
+        """
+        # second version
         if x is None:
             given_len = 0
             x = torch.ones(batch_size, 1, dtype=torch.int64)
@@ -248,8 +282,10 @@ class Transformer(nn.Module):
         if tgt_seq.is_cuda:
             samples_cat = samples_cat.cuda()
         return samples_cat
+        """
 
         """
+        # first version
         if x is None:
             # h, c = self.init_hidden(batch_size)
             x = torch.zeros(batch_size, 1, dtype=torch.int64)

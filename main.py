@@ -44,7 +44,7 @@ parser.add_argument('--update_rate', type=float, default=0.8, metavar='UR',
                     help='update rate of roll-out model (default: 0.8)')
 parser.add_argument('--n_rollout', type=int, default=16, metavar='N',
                     help='number of roll-out (default: 16)')
-parser.add_argument('--vocab_size', type=int, default=20, metavar='N',
+parser.add_argument('--vocab_size', type=int, default=21, metavar='N',
                     help='vocabulary size (default: 28261, 7521)')
 parser.add_argument('--batch_size', type=int, default=64, metavar='N',
                     help='batch size (default: 64)')
@@ -63,10 +63,10 @@ parser.add_argument('--seq_len', type=int, default=20, metavar='S',
 
 
 # Files
-POSITIVE_FILE = 'self.data'
-NEGATIVE_FILE = 'gen_self.data'
+POSITIVE_FILE = 'self_noz.data'
+NEGATIVE_FILE = 'gen_self_noz.data'
 # RANDOM_FILE = 'self_num_rand.data'
-EPOCH_FILE = 'epoch_self_12.data' # store samples every epoch during adversarial training
+EPOCH_FILE = 'epoch_self_noz.data' # store samples every epoch during adversarial training
 
 
 # Genrator Parameters
@@ -78,7 +78,7 @@ g_hidden_dim = 32
 
 # Discriminator Parameters
 d_num_class = 2
-d_embed_dim = 64
+d_embed_dim = 128
 d_filter_sizes = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 15, 20]
 # d_filter_sizes = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 12]
 # d_filter_sizes = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10]
