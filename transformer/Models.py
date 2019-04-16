@@ -201,6 +201,7 @@ class Transformer(nn.Module):
     def forward(self, src_seq, src_pos, tgt_seq, tgt_pos):
 
         tgt_seq, tgt_pos = tgt_seq[:, :-1], tgt_pos[:, :-1]
+        src_seq, src_pos = src_seq[:, 1:], src_pos[:, 1:]
 
         # enc_output, *_ = self.encoder(src_seq, src_pos)
         dec_output = self.decoder(tgt_seq, tgt_pos, src_seq)
