@@ -158,7 +158,7 @@ class Transformer(nn.Module):
     def __init__(
             self,
             n_src_vocab, n_tgt_vocab, len_max_seq,
-            d_word_vec=128, d_model=128, d_inner=496,
+            d_word_vec=64, d_model=64, d_inner=256,
             n_layers=6, n_head=8, d_k=64, d_v=64, dropout=0.1,
             tgt_emb_prj_weight_sharing=False,
             emb_src_tgt_weight_sharing=False):
@@ -223,6 +223,7 @@ class Transformer(nn.Module):
         if x is None:
             given_len = 0
             x = torch.zeros(batch_size, 1, dtype=torch.int64)
+            x += 11
             tgt_seq_part = tgt_seq[:, given_len:given_len + 1]
             tgt_pos_part = tgt_pos[:, given_len:given_len + 1]
             if tgt_seq.is_cuda:

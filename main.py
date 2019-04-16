@@ -70,7 +70,7 @@ EPOCH_FILE = 'epoch_self_noz.data' # store samples every epoch during adversaria
 
 
 # Genrator Parameters
-g_embed_dim = 128
+g_embed_dim = 64
 g_hidden_dim = 32
 # g_hidden_layer = 3
 # g_seq_len = 20
@@ -78,7 +78,7 @@ g_hidden_dim = 32
 
 # Discriminator Parameters
 d_num_class = 2
-d_embed_dim = 128
+d_embed_dim = 64
 d_filter_sizes = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 15, 20]
 # d_filter_sizes = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 12]
 # d_filter_sizes = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10]
@@ -435,7 +435,7 @@ if __name__ == '__main__':
         print("dis eval loss: {:.5f}, dis eval acc: {:.3f}\n"
               .format(dis_loss, dis_acc))
 
-    """
+
     # Save experiment data
     with open(args.data_path + 'experiment.pkl', 'wb') as f:
         pkl.dump(
@@ -453,4 +453,4 @@ if __name__ == '__main__':
             f,
             protocol=pkl.HIGHEST_PROTOCOL
         )
-    """
+
