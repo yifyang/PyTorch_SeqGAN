@@ -421,7 +421,7 @@ if __name__ == '__main__':
             dis_adversarial_train_loss, dis_adversarial_train_acc, args)
 
         # generate_samples(generator, args.batch_size, args.n_samples, NEGATIVE_FILE, ad_train=True, epoch_file=EPOCH_FILE)
-        generate_samples(generator, gen_data_iter, args, NEGATIVE_FILE)
+        generate_samples(generator, gen_data_iter, args, NEGATIVE_FILE, ad_train=True, epoch_file=EPOCH_FILE)
 
         gen_eval_iter = prepare_dataloaders(NEGATIVE_FILE, args.batch_size)
         dis_eval_iter = DisDataIter(POSITIVE_FILE, NEGATIVE_FILE, args.batch_size)
