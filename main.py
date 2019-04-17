@@ -64,9 +64,9 @@ parser.add_argument('--seq_len', type=int, default=20, metavar='S',
 
 # Files
 POSITIVE_FILE = 'self_noz.data'
-NEGATIVE_FILE = 'gen_self_noz.data'
+NEGATIVE_FILE = 'gen_self_noz_v2.data'
 # RANDOM_FILE = 'self_num_rand.data'
-EPOCH_FILE = 'epoch_self_noz.data' # store samples every epoch during adversarial training
+EPOCH_FILE = 'epoch_self_noz_v2.data' # store samples every epoch during adversarial training
 
 
 # Genrator Parameters
@@ -435,7 +435,7 @@ if __name__ == '__main__':
         print("dis eval loss: {:.5f}, dis eval acc: {:.3f}\n"
               .format(dis_loss, dis_acc))
 
-
+    """
     # Save experiment data
     with open(args.data_path + 'experiment.pkl', 'wb') as f:
         pkl.dump(
@@ -453,4 +453,4 @@ if __name__ == '__main__':
             f,
             protocol=pkl.HIGHEST_PROTOCOL
         )
-
+    """
