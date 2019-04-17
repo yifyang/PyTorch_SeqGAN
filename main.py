@@ -119,7 +119,7 @@ def generate_samples(model, data_iter, args, output_file, ad_train=False, epoch_
                 fout.write('%s\n' % string)
 
 
-def cal_performance(pred, gold, critireon, smoothing=False):
+def cal_performance(pred, gold, critireon, smoothing=True):
     ''' Apply label smoothing if needed '''
 
     loss = cal_loss(pred, gold, critireon, smoothing)
@@ -147,7 +147,7 @@ def cal_loss(pred, gold, critireon, smoothing):
         log_prb = F.log_softmax(pred, dim=1)
 
         # non_pad_mask = gold.ne(Constants.PAD)
-        loss = -(one_hot * log_prb).sum(dim=1)
+        loss = -(one_hot * log_prb).sum()
         # loss = loss.masked_select(non_pad_mask).sum()  # average later
     else:
         log_prb = F.log_softmax(pred, dim=1)

@@ -219,6 +219,7 @@ class Transformer(nn.Module):
 
     def sample(self, tgt_seq, tgt_pos, batch_size, seq_len, x=None):
         samples = []
+        """
         # Third version
         if x is None:
             given_len = 0
@@ -251,12 +252,14 @@ class Transformer(nn.Module):
         if tgt_seq.is_cuda:
             samples_cat = samples_cat.cuda()
         return samples_cat
-
         """
+
+
         # second version
         if x is None:
             given_len = 0
             x = torch.ones(batch_size, 1, dtype=torch.int64)
+            x += 11
             tgt_seq_part = tgt_seq[:, :given_len+1]
             tgt_pos_part = tgt_pos[:, :given_len+1]
             if tgt_seq.is_cuda:
@@ -284,7 +287,7 @@ class Transformer(nn.Module):
         if tgt_seq.is_cuda:
             samples_cat = samples_cat.cuda()
         return samples_cat
-        """
+
 
         """
         # first version
