@@ -145,7 +145,7 @@ def collate_fn(insts):
     return batch_seq, batch_pos
 
 
-def prepare_dataloaders(data_file, batch_size, rand_file=None):
+def prepare_dataloaders(data_file, batch_size, rand_file=""):
     with open(data_file, "r") as f:
         data_ori = f.readlines()
     data_o = []
@@ -153,13 +153,17 @@ def prepare_dataloaders(data_file, batch_size, rand_file=None):
         num_list = line.split(" ")
         data_o.append([int(item) for item in num_list])
     data_o = np.array(data_o)
-    with open(rand_file, "r") as f:
-        data_rand = f.readlines()
-    data_r = []
-    for line in data_rand:
-        num_list = line.split(" ")
-        data_r.append([int(item) for item in num_list])
-    data_r = np.array(data_r)
+
+    if rand_file=="":
+        data_r = data_o
+    else:
+        with open(rand_file, "r") as f:
+            data_rand = f.readlines()
+        data_r = []
+        for line in data_rand:
+            num_list = line.split(" ")
+            data_r.append([int(item) for item in num_list])
+        data_r = np.array(data_r)
 
     data_o = torch.LongTensor(data_o)
     data_r = torch.LongTensor(data_r)
