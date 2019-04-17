@@ -113,8 +113,8 @@ class DisDataIter:
         return lis
 
 class myDataset(torch.utils.data.Dataset):
-    def __init__(self, d_o):
-        self.data = torch.cat([torch.zeros(len(d_o), 1, dtype=torch.int64), d_o], dim=1)
+    def __init__(self, d_o, d_r):
+        self.data = torch.cat([torch.zeros(len(d_r), 1, dtype=torch.int64), d_r], dim=1)
         self.target = torch.cat([d_o, torch.zeros(len(d_o), 1, dtype=torch.int64)], dim=1)
         # self.data = data_num
         # self.target = data_num
@@ -145,7 +145,7 @@ def collate_fn(insts):
     return batch_seq, batch_pos
 
 
-def prepare_dataloaders(data_file, batch_size):
+def prepare_dataloaders(data_file, batch_size, rand_file=None):
     with open(data_file, "r") as f:
         data_ori = f.readlines()
     data_o = []
@@ -153,19 +153,19 @@ def prepare_dataloaders(data_file, batch_size):
         num_list = line.split(" ")
         data_o.append([int(item) for item in num_list])
     data_o = np.array(data_o)
-    # with open(rand_file, "r") as f:
-    #     data_rand = f.readlines()
-    # data_r = []
-    # for line in data_rand:
-    #     num_list = line.split(" ")
-    #     data_r.append([int(item) for item in num_list])
-    # data_r = np.array(data_r)
+    with open(rand_file, "r") as f:
+        data_rand = f.readlines()
+    data_r = []
+    for line in data_rand:
+        num_list = line.split(" ")
+        data_r.append([int(item) for item in num_list])
+    data_r = np.array(data_r)
 
     data_o = torch.LongTensor(data_o)
-    # data_r = torch.LongTensor(data_r)
+    data_r = torch.LongTensor(data_r)
 
     train_loader = torch.utils.data.DataLoader(
-        myDataset(data_o),
+        myDataset(data_o, data_r),
         num_workers=2,
         batch_size=batch_size,
         collate_fn=paired_collate_fn,

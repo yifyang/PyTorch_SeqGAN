@@ -219,7 +219,7 @@ class Transformer(nn.Module):
 
     def sample(self, tgt_seq, tgt_pos, batch_size, seq_len, x=None):
         samples = []
-
+        """
         # Third version
         if x is None:
             given_len = 0
@@ -252,9 +252,9 @@ class Transformer(nn.Module):
         if tgt_seq.is_cuda:
             samples_cat = samples_cat.cuda()
         return samples_cat
-
-
         """
+
+
         # second version
         if x is None:
             given_len = 0
@@ -287,7 +287,7 @@ class Transformer(nn.Module):
         if tgt_seq.is_cuda:
             samples_cat = samples_cat.cuda()
         return samples_cat
-        """
+
 
         """
         # first version
