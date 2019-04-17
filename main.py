@@ -147,7 +147,7 @@ def cal_loss(pred, gold, critireon, smoothing):
         log_prb = F.log_softmax(pred, dim=1)
 
         # non_pad_mask = gold.ne(Constants.PAD)
-        loss = -(one_hot * log_prb).sum()
+        loss = -(one_hot * log_prb).sum() / log_prb.size(0)
         # loss = loss.masked_select(non_pad_mask).sum()  # average later
     else:
         log_prb = F.log_softmax(pred, dim=1)
