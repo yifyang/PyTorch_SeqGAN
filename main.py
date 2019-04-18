@@ -143,6 +143,8 @@ def train_generator_PG(gen, dis, rollout, pg_loss, optimizer, epochs, args):
         loss.backward()
         optimizer.step()
 
+        print("Epoch {}, train loss: {:.5f}".format(epoch, loss))
+
 
 def eval_generator(model, data_iter, criterion, args):
     """
