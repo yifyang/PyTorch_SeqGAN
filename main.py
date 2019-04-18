@@ -26,19 +26,19 @@ parser.add_argument('--hpc', action='store_true', default=True,
                     help='set to hpc mode')
 parser.add_argument('--data_path', type=str, default='dataset/', metavar='PATH',
                     help='data path to save files (default: dataset/)')
-parser.add_argument('--rounds', type=int, default=200, metavar='N',
+parser.add_argument('--rounds', type=int, default=100, metavar='N',
                     help='rounds of adversarial training (default: 150)')
-parser.add_argument('--g_pretrain_steps', type=int, default=150, metavar='N',
+parser.add_argument('--g_pretrain_steps', type=int, default=100, metavar='N',
                     help='steps of pre-training of generators (default: 120)')
-parser.add_argument('--d_pretrain_steps', type=int, default=50, metavar='N',
+parser.add_argument('--d_pretrain_steps', type=int, default=80, metavar='N',
                     help='steps of pre-training of discriminators (default: 50)')
 parser.add_argument('--g_steps', type=int, default=1, metavar='N',
                     help='steps of generator updates in one round of adverarial training (default: 1)')
 parser.add_argument('--d_steps', type=int, default=3, metavar='N',
                     help='steps of discriminator updates in one round of adverarial training (default: 3)')
-parser.add_argument('--gk_epochs', type=int, default=2, metavar='N',
+parser.add_argument('--gk_epochs', type=int, default=1, metavar='N',
                     help='epochs of generator updates in one step of generate update (default: 1)')
-parser.add_argument('--dk_epochs', type=int, default=2, metavar='N',
+parser.add_argument('--dk_epochs', type=int, default=3, metavar='N',
                     help='epochs of discriminator updates in one step of discriminator update (default: 3)')
 parser.add_argument('--update_rate', type=float, default=0.8, metavar='UR',
                     help='update rate of roll-out model (default: 0.8)')
@@ -199,9 +199,9 @@ def train_generator_PG(gen, dis, gen_data_iter, rollout, pg_loss, optimizer, epo
         # model.sample(tgt_seq, tgt_pos, len(tgt_seq), seq_len)
 
         samples = generator.sample(tgt_seq, tgt_pos, len(tgt_seq), args.seq_len)
-        zeros = torch.zeros(args.batch_size, 1, dtype=torch.int64)
-        if args.cuda:
-            zeros = zeros.cuda()
+        # zeros = torch.zeros(args.batch_size, 1, dtype=torch.int64)
+        # if args.cuda:
+        #     zeros = zeros.cuda()
         # inputs = torch.cat([zeros, samples.data], dim = 1)[:, :-1].contiguous()
         targets = samples.data.contiguous().view((-1,))
 
