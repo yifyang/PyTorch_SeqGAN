@@ -30,13 +30,13 @@ parser.add_argument('--rounds', type=int, default=100, metavar='N',
                     help='rounds of adversarial training (default: 150)')
 parser.add_argument('--g_pretrain_steps', type=int, default=100, metavar='N',
                     help='steps of pre-training of generators (default: 120)')
-parser.add_argument('--d_pretrain_steps', type=int, default=80, metavar='N',
+parser.add_argument('--d_pretrain_steps', type=int, default=70, metavar='N',
                     help='steps of pre-training of discriminators (default: 50)')
 parser.add_argument('--g_steps', type=int, default=1, metavar='N',
                     help='steps of generator updates in one round of adverarial training (default: 1)')
-parser.add_argument('--d_steps', type=int, default=3, metavar='N',
+parser.add_argument('--d_steps', type=int, default=2, metavar='N',
                     help='steps of discriminator updates in one round of adverarial training (default: 3)')
-parser.add_argument('--gk_epochs', type=int, default=1, metavar='N',
+parser.add_argument('--gk_epochs', type=int, default=3, metavar='N',
                     help='epochs of generator updates in one step of generate update (default: 1)')
 parser.add_argument('--dk_epochs', type=int, default=3, metavar='N',
                     help='epochs of discriminator updates in one step of discriminator update (default: 3)')
