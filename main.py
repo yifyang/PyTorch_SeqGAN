@@ -179,9 +179,9 @@ def train_generator_MLE(gen, data_iter, criterion, optimizer, epochs,
             optimizer.step_and_update_lr()
             total_loss += loss.item()
         # data_iter.reset()
-    avg_loss = total_loss / len(batch)
-    print("Epoch {}, train loss: {:.5f}".format(epoch, avg_loss))
-    gen_pretrain_train_loss.append(avg_loss)
+        avg_loss = total_loss / len(batch)
+        print("Epoch {}, train loss: {:.5f}".format(epoch, avg_loss))
+        gen_pretrain_train_loss.append(avg_loss)
 
 
 def train_generator_PG(gen, dis, gen_data_iter, rollout, pg_loss, optimizer, epochs, args):
