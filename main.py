@@ -175,7 +175,8 @@ def train_generator_MLE(gen, data_iter, criterion, optimizer, epochs,
             output = gen(src_seq, src_pos, tgt_seq, tgt_pos)
             loss, n_correct = cal_performance(output, tgt_seq[:, :-1], criterion)
             loss.backward()
-            optimizer.step_and_update_lr()
+            optimizer.step()
+            # optimizer.step_and_update_lr()
             total_loss += loss.item()
         # data_iter.reset()
         avg_loss = total_loss / len(batch)
@@ -214,7 +215,8 @@ def train_generator_PG(gen, dis, gen_data_iter, rollout, pg_loss, optimizer, epo
         loss = pg_loss(output, targets, rewards)
         optimizer.zero_grad()
         loss.backward()
-        optimizer.step_and_update_lr()
+        optimizer.step()
+        # optimizer.step_and_update_lr()
 
         print("Epoch {}, train loss: {:.5f}".format(epoch, loss))
 
