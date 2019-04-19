@@ -26,19 +26,19 @@ parser.add_argument('--hpc', action='store_true', default=True,
                     help='set to hpc mode')
 parser.add_argument('--data_path', type=str, default='dataset/', metavar='PATH',
                     help='data path to save files (default: dataset/)')
-parser.add_argument('--rounds', type=int, default=100, metavar='N',
+parser.add_argument('--rounds', type=int, default=200, metavar='N',  # 100
                     help='rounds of adversarial training (default: 150)')
-parser.add_argument('--g_pretrain_steps', type=int, default=50, metavar='N',
+parser.add_argument('--g_pretrain_steps', type=int, default=200, metavar='N', # 50
                     help='steps of pre-training of generators (default: 120)')
-parser.add_argument('--d_pretrain_steps', type=int, default=100, metavar='N',
+parser.add_argument('--d_pretrain_steps', type=int, default=70, metavar='N', # 100
                     help='steps of pre-training of discriminators (default: 50)')
-parser.add_argument('--g_steps', type=int, default=1, metavar='N',
+parser.add_argument('--g_steps', type=int, default=1, metavar='N', # 1
                     help='steps of generator updates in one round of adverarial training (default: 1)')
-parser.add_argument('--d_steps', type=int, default=2, metavar='N',
+parser.add_argument('--d_steps', type=int, default=2, metavar='N', # 2
                     help='steps of discriminator updates in one round of adverarial training (default: 3)')
-parser.add_argument('--gk_epochs', type=int, default=3, metavar='N',
+parser.add_argument('--gk_epochs', type=int, default=3, metavar='N', # 3
                     help='epochs of generator updates in one step of generate update (default: 1)')
-parser.add_argument('--dk_epochs', type=int, default=3, metavar='N',
+parser.add_argument('--dk_epochs', type=int, default=3, metavar='N', # 3
                     help='epochs of discriminator updates in one step of discriminator update (default: 3)')
 parser.add_argument('--update_rate', type=float, default=0.8, metavar='UR',
                     help='update rate of roll-out model (default: 0.8)')
