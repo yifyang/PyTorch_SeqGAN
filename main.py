@@ -175,8 +175,8 @@ def train_generator_MLE(gen, data_iter, criterion, optimizer, epochs,
             output = gen(src_seq, src_pos, tgt_seq, tgt_pos)
             loss, n_correct = cal_performance(output, tgt_seq[:, :-1], criterion)
             loss.backward()
-            optimizer.step()
-            # optimizer.step_and_update_lr()
+            # optimizer.step()
+            optimizer.step_and_update_lr()
             total_loss += loss.item()
         # data_iter.reset()
         avg_loss = total_loss / len(batch)
@@ -348,11 +348,11 @@ if __name__ == '__main__':
         pg_loss = pg_loss.cuda()
         cudnn.benchmark = True
     gen_optimizer = optim.Adam(params=generator.parameters(), lr=args.gen_lr)
-    # gen_optimizer = ScheduledOptim(
-    #     optim.Adam(
-    #         filter(lambda x: x.requires_grad, generator.parameters()),
-    #         betas=(0.9, 0.98), eps=1e-09),
-    #     512, 4000)
+    gen_pre_optimizer = ScheduledOptim(
+        optim.Adam(
+            filter(lambda x: x.requires_grad, generator.parameters()),
+            betas=(0.9, 0.98), eps=1e-09),
+        512, 4000)
     dis_optimizer = optim.SGD(params=discriminator.parameters(), lr=args.dis_lr)
 
     # Container of experiment data
@@ -385,7 +385,7 @@ if __name__ == '__main__':
     for i in range(args.g_pretrain_steps):
         print("G-Step {}".format(i))
         train_generator_MLE(generator, gen_data_iter, nll_loss,
-            gen_optimizer, args.gk_epochs, gen_pretrain_train_loss, args)
+            gen_pre_optimizer, args.gk_epochs, gen_pretrain_train_loss, args)
         generate_samples(generator, gen_data_iter, args, NEGATIVE_FILE)
         eval_iter = prepare_dataloaders(NEGATIVE_FILE, args.batch_size)
         gen_loss = eval_generator(target_lstm, eval_iter, nll_loss, args)
