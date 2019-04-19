@@ -259,7 +259,7 @@ class Transformer(nn.Module):
         if x is None:
             given_len = 0
             x = torch.ones(batch_size, 1, dtype=torch.int64)
-            x += 11
+            x += 1
             tgt_seq_part = tgt_seq[:, :given_len+1]
             tgt_pos_part = tgt_pos[:, :given_len+1]
             if tgt_seq.is_cuda:
