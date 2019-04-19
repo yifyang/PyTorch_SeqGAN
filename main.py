@@ -28,7 +28,7 @@ parser.add_argument('--data_path', type=str, default='dataset/', metavar='PATH',
                     help='data path to save files (default: dataset/)')
 parser.add_argument('--rounds', type=int, default=100, metavar='N',  # 100
                     help='rounds of adversarial training (default: 150)')
-parser.add_argument('--g_pretrain_steps', type=int, default=500, metavar='N', # 50
+parser.add_argument('--g_pretrain_steps', type=int, default=50, metavar='N', # 50
                     help='steps of pre-training of generators (default: 120)')
 parser.add_argument('--d_pretrain_steps', type=int, default=100, metavar='N', # 100
                     help='steps of pre-training of discriminators (default: 50)')
