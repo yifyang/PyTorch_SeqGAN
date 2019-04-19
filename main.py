@@ -28,7 +28,7 @@ parser.add_argument('--data_path', type=str, default='dataset/', metavar='PATH',
                     help='data path to save files (default: dataset/)')
 parser.add_argument('--rounds', type=int, default=100, metavar='N',  # 100
                     help='rounds of adversarial training (default: 150)')
-parser.add_argument('--g_pretrain_steps', type=int, default=50, metavar='N', # 50
+parser.add_argument('--g_pretrain_steps', type=int, default=100, metavar='N', # 50
                     help='steps of pre-training of generators (default: 120)')
 parser.add_argument('--d_pretrain_steps', type=int, default=100, metavar='N', # 100
                     help='steps of pre-training of discriminators (default: 50)')
@@ -63,10 +63,10 @@ parser.add_argument('--seq_len', type=int, default=20, metavar='S',
 
 
 # Files
-POSITIVE_FILE = 'plot.data'
-NEGATIVE_FILE = 'gen_plot.data'
+POSITIVE_FILE = 'plot1.data'
+NEGATIVE_FILE = 'gen_plot1.data'
 RANDOM_FILE = 'plot_rand.data'
-EPOCH_FILE = 'epoch_plot.data' # store samples every epoch during adversarial training
+EPOCH_FILE = 'epoch_plot1.data' # store samples every epoch during adversarial training
 
 # Genrator Parameters
 g_embed_dim = 64
@@ -116,7 +116,7 @@ def generate_samples(model, data_iter, args, output_file, toy_data=False, ad_tra
                 # fout.write('{}\n'.format(string))
                 string = ' '.join([str(s) for s in sample])
                 fout.write('%s\n' % string)
-                
+
     if ad_train:
         with open(epoch_file, 'a') as fout:
             for i, sample in enumerate(samples):
@@ -127,7 +127,7 @@ def generate_samples(model, data_iter, args, output_file, toy_data=False, ad_tra
                 fout.write('%s\n' % string)
 
 
-def cal_performance(pred, gold, critireon, smoothing=True):
+def cal_performance(pred, gold, critireon, smoothing=False):
     ''' Apply label smoothing if needed '''
 
     loss = cal_loss(pred, gold, critireon, smoothing)
@@ -184,8 +184,8 @@ def train_generator_MLE(gen, data_iter, criterion, optimizer, epochs,
             output = gen(src_seq, src_pos, tgt_seq, tgt_pos)
             loss, n_correct = cal_performance(output, tgt_seq[:, :-1], criterion)
             loss.backward()
-            # optimizer.step()
-            optimizer.step_and_update_lr()
+            optimizer.step()
+            # optimizer.step_and_update_lr()
             total_loss += loss.item()
         # data_iter.reset()
         avg_loss = total_loss / len(batch)
@@ -394,7 +394,7 @@ if __name__ == '__main__':
     for i in range(args.g_pretrain_steps):
         print("G-Step {}".format(i))
         train_generator_MLE(generator, gen_data_iter, nll_loss,
-            gen_pre_optimizer, args.gk_epochs, gen_pretrain_train_loss, args)
+            gen_optimizer, args.gk_epochs, gen_pretrain_train_loss, args)
         generate_samples(generator, gen_data_iter, args, NEGATIVE_FILE)
         eval_iter = prepare_dataloaders(NEGATIVE_FILE, args.batch_size)
         gen_loss = eval_generator(target_lstm, eval_iter, nll_loss, args)
