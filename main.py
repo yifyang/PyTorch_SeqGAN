@@ -28,7 +28,7 @@ parser.add_argument('--data_path', type=str, default='dataset/', metavar='PATH',
                     help='data path to save files (default: dataset/)')
 parser.add_argument('--rounds', type=int, default=100, metavar='N',  # 100
                     help='rounds of adversarial training (default: 150)')
-parser.add_argument('--g_pretrain_steps', type=int, default=100, metavar='N', # 50
+parser.add_argument('--g_pretrain_steps', type=int, default=50, metavar='N', # 50
                     help='steps of pre-training of generators (default: 120)')
 parser.add_argument('--d_pretrain_steps', type=int, default=100, metavar='N', # 100
                     help='steps of pre-training of discriminators (default: 50)')
@@ -42,9 +42,9 @@ parser.add_argument('--dk_epochs', type=int, default=3, metavar='N', # 3
                     help='epochs of discriminator updates in one step of discriminator update (default: 3)')
 parser.add_argument('--update_rate', type=float, default=0.8, metavar='UR',
                     help='update rate of roll-out model (default: 0.8)')
-parser.add_argument('--n_rollout', type=int, default=16, metavar='N',
+parser.add_argument('--n_rollout', type=int, default=3, metavar='N',
                     help='number of roll-out (default: 16)')
-parser.add_argument('--vocab_size', type=int, default=10, metavar='N',
+parser.add_argument('--vocab_size', type=int, default=21, metavar='N',
                     help='vocabulary size (default: 28261, 7521)')
 parser.add_argument('--batch_size', type=int, default=64, metavar='N',
                     help='batch size (default: 64)')
@@ -63,10 +63,10 @@ parser.add_argument('--seq_len', type=int, default=20, metavar='S',
 
 
 # Files
-POSITIVE_FILE = 'plot1.data'
-NEGATIVE_FILE = 'gen_plot1.data'
-RANDOM_FILE = 'plot_rand.data'
-EPOCH_FILE = 'epoch_plot1.data' # store samples every epoch during adversarial training
+POSITIVE_FILE = 'self_noz.data'
+NEGATIVE_FILE = 'gen_self_noz.data'
+RANDOM_FILE = 'self_rand_noz.data'
+EPOCH_FILE = 'epoch_self_noz.data' # store samples every epoch during adversarial training
 
 # Genrator Parameters
 g_embed_dim = 64
@@ -212,7 +212,7 @@ def train_generator_PG(gen, dis, gen_data_iter, rollout, pg_loss, optimizer, epo
         # if args.cuda:
         #     zeros = zeros.cuda()
         # inputs = torch.cat([zeros, samples.data], dim = 1)[:, :-1].contiguous()
-        targets = samples.data.contiguous().view((-1,))
+        targets = tgt_seq[:, :-1].data.contiguous().view((-1,))
 
         # calculate the reward
         rewards = torch.tensor(rollout.get_reward(samples, tgt_seq, tgt_pos, args.n_rollout, dis))
@@ -220,7 +220,7 @@ def train_generator_PG(gen, dis, gen_data_iter, rollout, pg_loss, optimizer, epo
             rewards = rewards.cuda()
 
         # update generator
-        output = gen(src_seq, src_pos, tgt_seq, tgt_pos)
+        # output = gen(src_seq, src_pos, tgt_seq, tgt_pos)
         loss = pg_loss(output, targets, rewards)
         optimizer.zero_grad()
         loss.backward()
@@ -376,13 +376,13 @@ if __name__ == '__main__':
     dis_adversarial_train_acc = []
     dis_adversarial_eval_loss = []
     dis_adversarial_eval_acc = []
-
+    """
     # Generate toy data using target LSTM
     print('#####################################################')
     print('Generating data ...')
     print('#####################################################\n\n')
     generate_samples(target_lstm, args.batch_size, args.n_samples, POSITIVE_FILE, toy_data=True)
-
+    """
     # Pre-train generator using MLE
     print('#####################################################')
     print('Start pre-training generator with MLE...')
@@ -390,7 +390,7 @@ if __name__ == '__main__':
 
     # gen_data_iter = GenDataIter(POSITIVE_FILE, args.batch_size)
     gen_data_iter = prepare_dataloaders(POSITIVE_FILE, args.batch_size, RANDOM_FILE)
-
+    """
     for i in range(args.g_pretrain_steps):
         print("G-Step {}".format(i))
         train_generator_MLE(generator, gen_data_iter, nll_loss,
@@ -418,7 +418,7 @@ if __name__ == '__main__':
         dis_pretrain_eval_acc.append(dis_acc)
         print("eval loss: {:.5f}, eval acc: {:.3f}\n".format(dis_loss, dis_acc))
     print('#####################################################\n\n')
-
+    """
     # Adversarial training
     print('#####################################################')
     print('Start adversarial training...')
