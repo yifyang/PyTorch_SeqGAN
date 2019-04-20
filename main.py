@@ -221,7 +221,7 @@ def train_generator_PG(gen, dis, gen_data_iter, rollout, pg_loss, optimizer, epo
 
         # update generator
         # output = gen(src_seq, src_pos, tgt_seq, tgt_pos)
-        loss = pg_loss(output, targets, rewards)
+        loss = pg_loss(samples, targets, rewards)
         optimizer.zero_grad()
         loss.backward()
         optimizer.step()
@@ -445,7 +445,7 @@ if __name__ == '__main__':
         print("dis eval loss: {:.5f}, dis eval acc: {:.3f}\n"
               .format(dis_loss, dis_acc))
 
-    
+
     # Save experiment data
     with open(args.data_path + 'experiment.pkl', 'wb') as f:
         pkl.dump(
