@@ -220,8 +220,8 @@ def train_generator_PG(gen, dis, gen_data_iter, rollout, pg_loss, optimizer, epo
             rewards = rewards.cuda()
 
         # update generator
-        # output = gen(src_seq, src_pos, tgt_seq, tgt_pos)
-        loss = pg_loss(samples, targets, rewards)
+        output = gen(samples, src_pos, tgt_seq, tgt_pos)
+        loss = pg_loss(output, targets, rewards)
         optimizer.zero_grad()
         loss.backward()
         optimizer.step()

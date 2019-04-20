@@ -206,6 +206,7 @@ class Transformer(nn.Module):
         # enc_output, *_ = self.encoder(src_seq, src_pos)
         dec_output = self.decoder(tgt_seq, tgt_pos, src_seq)
         out = self.tgt_word_prj(dec_output.contiguous().view(-1, self.d_model)) * self.x_logit_scale
+        out = self.log_softmax(out)
 
         return out
 
@@ -214,7 +215,7 @@ class Transformer(nn.Module):
 
         dec_output = self.decoder(tgt_seq, tgt_pos, src_seq)
         out = self.tgt_word_prj(dec_output.contiguous().view(-1, self.d_model)) * self.x_logit_scale
-        # out = self.log_softmax(dec_output)
+        out = self.log_softmax(out)
         return out
 
     def sample(self, tgt_seq, tgt_pos, batch_size, seq_len, x=None):

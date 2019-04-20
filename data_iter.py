@@ -116,8 +116,8 @@ class myDataset(torch.utils.data.Dataset):
     def __init__(self, d_o, d_r):
         self.data = torch.cat([torch.zeros(len(d_r), 1, dtype=torch.int64), d_r], dim=1)
         self.target = torch.cat([d_o, torch.zeros(len(d_o), 1, dtype=torch.int64)], dim=1)
-        # self.data = data_num
-        # self.target = data_num
+        # self.data = d_r
+        # self.target = d_o
 
     def __getitem__(self, index):
         return self.data[index], self.target[index]
