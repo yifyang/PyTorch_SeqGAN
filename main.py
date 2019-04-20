@@ -36,9 +36,9 @@ parser.add_argument('--g_steps', type=int, default=1, metavar='N', # 1
                     help='steps of generator updates in one round of adverarial training (default: 1)')
 parser.add_argument('--d_steps', type=int, default=2, metavar='N', # 2
                     help='steps of discriminator updates in one round of adverarial training (default: 3)')
-parser.add_argument('--gk_epochs', type=int, default=3, metavar='N', # 3
+parser.add_argument('--gk_epochs', type=int, default=1, metavar='N', # 3
                     help='epochs of generator updates in one step of generate update (default: 1)')
-parser.add_argument('--dk_epochs', type=int, default=3, metavar='N', # 3
+parser.add_argument('--dk_epochs', type=int, default=2, metavar='N', # 3
                     help='epochs of discriminator updates in one step of discriminator update (default: 3)')
 parser.add_argument('--update_rate', type=float, default=0.8, metavar='UR',
                     help='update rate of roll-out model (default: 0.8)')
