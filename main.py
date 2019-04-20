@@ -390,7 +390,7 @@ if __name__ == '__main__':
 
     # gen_data_iter = GenDataIter(POSITIVE_FILE, args.batch_size)
     gen_data_iter = prepare_dataloaders(POSITIVE_FILE, args.batch_size, RANDOM_FILE)
-    """
+
     for i in range(args.g_pretrain_steps):
         print("G-Step {}".format(i))
         train_generator_MLE(generator, gen_data_iter, nll_loss,
@@ -418,7 +418,7 @@ if __name__ == '__main__':
         dis_pretrain_eval_acc.append(dis_acc)
         print("eval loss: {:.5f}, eval acc: {:.3f}\n".format(dis_loss, dis_acc))
     print('#####################################################\n\n')
-    """
+
     # Adversarial training
     print('#####################################################')
     print('Start adversarial training...')
