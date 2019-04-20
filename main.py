@@ -394,7 +394,7 @@ if __name__ == '__main__':
     for i in range(args.g_pretrain_steps):
         print("G-Step {}".format(i))
         train_generator_MLE(generator, gen_data_iter, nll_loss,
-            gen_optimizer, args.gk_epochs, gen_pretrain_train_loss, args)
+            gen_pre_optimizer, args.gk_epochs, gen_pretrain_train_loss, args)
         generate_samples(generator, gen_data_iter, args, NEGATIVE_FILE)
         eval_iter = prepare_dataloaders(NEGATIVE_FILE, args.batch_size)
         gen_loss = eval_generator(target_lstm, eval_iter, nll_loss, args)
