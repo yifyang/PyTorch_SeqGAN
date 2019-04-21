@@ -63,10 +63,10 @@ parser.add_argument('--seq_len', type=int, default=20, metavar='S',
 
 
 # Files
-POSITIVE_FILE = 'plot_0421.data'
-NEGATIVE_FILE = 'gen_plot_0421.data'
+POSITIVE_FILE = 'plot_0421_a.data'
+NEGATIVE_FILE = 'gen_plot_0421_a.data'
 RANDOM_FILE = 'plot_rand.data'
-EPOCH_FILE = 'epoch_plot_0421.data' # store samples every epoch during adversarial training
+EPOCH_FILE = 'epoch_plot_0421_a.data' # store samples every epoch during adversarial training
 
 # Genrator Parameters
 g_embed_dim = 64
@@ -127,7 +127,7 @@ def generate_samples(model, data_iter, args, output_file, toy_data=False, ad_tra
                 fout.write('%s\n' % string)
 
 
-def cal_performance(pred, gold, critireon, smoothing=True):
+def cal_performance(pred, gold, critireon, smoothing=False):
     ''' Apply label smoothing if needed '''
 
     loss = cal_loss(pred, gold, critireon, smoothing)
@@ -394,7 +394,7 @@ if __name__ == '__main__':
     for i in range(args.g_pretrain_steps):
         print("G-Step {}".format(i))
         train_generator_MLE(generator, gen_data_iter, nll_loss,
-            gen_pre_optimizer, args.gk_epochs, gen_pretrain_train_loss, args)
+            gen_optimizer, args.gk_epochs, gen_pretrain_train_loss, args)
         generate_samples(generator, gen_data_iter, args, NEGATIVE_FILE)
         eval_iter = prepare_dataloaders(NEGATIVE_FILE, args.batch_size)
         gen_loss = eval_generator(target_lstm, eval_iter, nll_loss, args)
