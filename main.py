@@ -376,13 +376,13 @@ if __name__ == '__main__':
     dis_adversarial_train_acc = []
     dis_adversarial_eval_loss = []
     dis_adversarial_eval_acc = []
-    """
+
     # Generate toy data using target LSTM
     print('#####################################################')
     print('Generating data ...')
     print('#####################################################\n\n')
     generate_samples(target_lstm, args.batch_size, args.n_samples, POSITIVE_FILE, toy_data=True)
-    """
+
     # Pre-train generator using MLE
     print('#####################################################')
     print('Start pre-training generator with MLE...')
