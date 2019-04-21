@@ -26,9 +26,9 @@ parser.add_argument('--hpc', action='store_true', default=True,
                     help='set to hpc mode')
 parser.add_argument('--data_path', type=str, default='dataset/', metavar='PATH',
                     help='data path to save files (default: dataset/)')
-parser.add_argument('--rounds', type=int, default=200, metavar='N',  # 100
+parser.add_argument('--rounds', type=int, default=150, metavar='N',  # 100
                     help='rounds of adversarial training (default: 150)')
-parser.add_argument('--g_pretrain_steps', type=int, default=200, metavar='N', # 50
+parser.add_argument('--g_pretrain_steps', type=int, default=89, metavar='N', # 50
                     help='steps of pre-training of generators (default: 120)')
 parser.add_argument('--d_pretrain_steps', type=int, default=70, metavar='N', # 100
                     help='steps of pre-training of discriminators (default: 50)')
@@ -445,7 +445,7 @@ if __name__ == '__main__':
         print("dis eval loss: {:.5f}, dis eval acc: {:.3f}\n"
               .format(dis_loss, dis_acc))
 
-    """
+
     # Save experiment data
     with open(args.data_path + 'experiment.pkl', 'wb') as f:
         pkl.dump(
@@ -463,4 +463,4 @@ if __name__ == '__main__':
             f,
             protocol=pkl.HIGHEST_PROTOCOL
         )
-    """
+
