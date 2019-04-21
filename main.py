@@ -399,7 +399,7 @@ if __name__ == '__main__':
         # eval_iter = prepare_dataloaders(NEGATIVE_FILE, args.batch_size)
         # gen_loss = eval_generator(target_lstm, eval_iter, nll_loss, args)
         # gen_pretrain_eval_loss.append(gen_loss)
-        print("eval loss: {:.5f}\n".format(gen_loss))
+        # print("eval loss: {:.5f}\n".format(gen_loss))
     print('#####################################################\n\n')
 
     # Pre-train discriminator
@@ -440,8 +440,8 @@ if __name__ == '__main__':
         dis_loss, dis_acc = eval_discriminator(discriminator, dis_eval_iter, nll_loss, args)
         dis_adversarial_eval_loss.append(dis_loss)
         dis_adversarial_eval_acc.append(dis_acc)
-        print("gen eval loss: {:.5f}, dis eval loss: {:.5f}, dis eval acc: {:.3f}\n"
-            .format(gen_loss, dis_loss, dis_acc))
+        # print("gen eval loss: {:.5f}, dis eval loss: {:.5f}, dis eval acc: {:.3f}\n"
+        #     .format(gen_loss, dis_loss, dis_acc))
         print("dis eval loss: {:.5f}, dis eval acc: {:.3f}\n"
               .format(dis_loss, dis_acc))
 
