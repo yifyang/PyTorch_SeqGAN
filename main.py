@@ -26,17 +26,17 @@ parser.add_argument('--hpc', action='store_true', default=True,
                     help='set to hpc mode')
 parser.add_argument('--data_path', type=str, default='dataset/', metavar='PATH',
                     help='data path to save files (default: dataset/)')
-parser.add_argument('--rounds', type=int, default=100, metavar='N',  # 100
+parser.add_argument('--rounds', type=int, default=200, metavar='N',  # 100
                     help='rounds of adversarial training (default: 150)')
-parser.add_argument('--g_pretrain_steps', type=int, default=20, metavar='N', # 50
+parser.add_argument('--g_pretrain_steps', type=int, default=200, metavar='N', # 50
                     help='steps of pre-training of generators (default: 120)')
-parser.add_argument('--d_pretrain_steps', type=int, default=100, metavar='N', # 100
+parser.add_argument('--d_pretrain_steps', type=int, default=70, metavar='N', # 100
                     help='steps of pre-training of discriminators (default: 50)')
 parser.add_argument('--g_steps', type=int, default=1, metavar='N', # 1
                     help='steps of generator updates in one round of adverarial training (default: 1)')
 parser.add_argument('--d_steps', type=int, default=2, metavar='N', # 2
                     help='steps of discriminator updates in one round of adverarial training (default: 3)')
-parser.add_argument('--gk_epochs', type=int, default=3, metavar='N', # 3
+parser.add_argument('--gk_epochs', type=int, default=2, metavar='N', # 3
                     help='epochs of generator updates in one step of generate update (default: 1)')
 parser.add_argument('--dk_epochs', type=int, default=2, metavar='N', # 3
                     help='epochs of discriminator updates in one step of discriminator update (default: 3)')
@@ -44,7 +44,7 @@ parser.add_argument('--update_rate', type=float, default=0.8, metavar='UR',
                     help='update rate of roll-out model (default: 0.8)')
 parser.add_argument('--n_rollout', type=int, default=3, metavar='N',
                     help='number of roll-out (default: 16)')
-parser.add_argument('--vocab_size', type=int, default=21, metavar='N',
+parser.add_argument('--vocab_size', type=int, default=10, metavar='N',
                     help='vocabulary size (default: 28261, 7521)')
 parser.add_argument('--batch_size', type=int, default=64, metavar='N',
                     help='batch size (default: 64)')
@@ -63,10 +63,10 @@ parser.add_argument('--seq_len', type=int, default=20, metavar='S',
 
 
 # Files
-POSITIVE_FILE = 'self_noz.data'
-NEGATIVE_FILE = 'gen_self_noz.data'
-RANDOM_FILE = 'self_rand_noz.data'
-EPOCH_FILE = 'epoch_self_noz.data' # store samples every epoch during adversarial training
+POSITIVE_FILE = 'plot_0421.data'
+NEGATIVE_FILE = 'gen_plot_0421.data'
+RANDOM_FILE = 'plot_rand.data'
+EPOCH_FILE = 'epoch_plot_0421.data' # store samples every epoch during adversarial training
 
 # Genrator Parameters
 g_embed_dim = 64
@@ -445,7 +445,7 @@ if __name__ == '__main__':
         print("dis eval loss: {:.5f}, dis eval acc: {:.3f}\n"
               .format(dis_loss, dis_acc))
 
-
+    """
     # Save experiment data
     with open(args.data_path + 'experiment.pkl', 'wb') as f:
         pkl.dump(
@@ -463,4 +463,4 @@ if __name__ == '__main__':
             f,
             protocol=pkl.HIGHEST_PROTOCOL
         )
-
+    """
