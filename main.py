@@ -65,7 +65,7 @@ parser.add_argument('--seq_len', type=int, default=20, metavar='S',
 # Files
 POSITIVE_FILE = 'plot_0421_n.data'
 NEGATIVE_FILE = 'gen_plot_0421_n.data'
-RANDOM_FILE = 'plot_rand.data'
+RANDOM_FILE = 'plot_0421_n.data'
 EPOCH_FILE = 'epoch_plot_0421_n.data' # store samples every epoch during adversarial training
 
 # Genrator Parameters
