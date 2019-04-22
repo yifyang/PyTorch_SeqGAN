@@ -42,7 +42,7 @@ parser.add_argument('--dk_epochs', type=int, default=2, metavar='N', # 3
                     help='epochs of discriminator updates in one step of discriminator update (default: 3)')
 parser.add_argument('--update_rate', type=float, default=0.8, metavar='UR',
                     help='update rate of roll-out model (default: 0.8)')
-parser.add_argument('--n_rollout', type=int, default=3, metavar='N',
+parser.add_argument('--n_rollout', type=int, default=16, metavar='N',
                     help='number of roll-out (default: 16)')
 parser.add_argument('--vocab_size', type=int, default=10, metavar='N',
                     help='vocabulary size (default: 28261, 7521)')
