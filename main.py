@@ -26,11 +26,11 @@ parser.add_argument('--hpc', action='store_true', default=True,
                     help='set to hpc mode')
 parser.add_argument('--data_path', type=str, default='dataset/', metavar='PATH',
                     help='data path to save files (default: dataset/)')
-parser.add_argument('--rounds', type=int, default=100, metavar='N',  # 100
+parser.add_argument('--rounds', type=int, default=200, metavar='N',  # 100
                     help='rounds of adversarial training (default: 150)')
-parser.add_argument('--g_pretrain_steps', type=int, default=50, metavar='N', # 50
+parser.add_argument('--g_pretrain_steps', type=int, default=200, metavar='N', # 50
                     help='steps of pre-training of generators (default: 120)')
-parser.add_argument('--d_pretrain_steps', type=int, default=100, metavar='N', # 100
+parser.add_argument('--d_pretrain_steps', type=int, default=70, metavar='N', # 100
                     help='steps of pre-training of discriminators (default: 50)')
 parser.add_argument('--g_steps', type=int, default=1, metavar='N', # 1
                     help='steps of generator updates in one round of adverarial training (default: 1)')
@@ -44,11 +44,11 @@ parser.add_argument('--update_rate', type=float, default=0.8, metavar='UR',
                     help='update rate of roll-out model (default: 0.8)')
 parser.add_argument('--n_rollout', type=int, default=16, metavar='N',
                     help='number of roll-out (default: 16)')
-parser.add_argument('--vocab_size', type=int, default=10, metavar='N',
+parser.add_argument('--vocab_size', type=int, default=28261, metavar='N',
                     help='vocabulary size (default: 28261, 7521)')
 parser.add_argument('--batch_size', type=int, default=64, metavar='N',
                     help='batch size (default: 64)')
-parser.add_argument('--n_samples', type=int, default=6400, metavar='N',
+parser.add_argument('--n_samples', type=int, default=35094, metavar='N',
                     help='number of samples gerenated per time (default: 35094, 3317)')
 parser.add_argument('--gen_lr', type=float, default=1e-3, metavar='LR',
                     help='learning rate of generator optimizer (default: 1e-3)')
@@ -58,18 +58,18 @@ parser.add_argument('--no_cuda', action='store_true', default=False,
                     help='disables CUDA training')
 parser.add_argument('--seed', type=int, default=1, metavar='S',
                     help='random seed (default: 1)')
-parser.add_argument('--seq_len', type=int, default=20, metavar='S',
+parser.add_argument('--seq_len', type=int, default=10, metavar='S',
                     help='random seed (default: 10)')
 
 
 # Files
-POSITIVE_FILE = 'plot_0421_n.data'
-NEGATIVE_FILE = 'gen_plot_0421_n.data'
-RANDOM_FILE = 'plot_0421_n.data'
-EPOCH_FILE = 'epoch_plot_0421_n.data' # store samples every epoch during adversarial training
+POSITIVE_FILE = 'news.data'
+NEGATIVE_FILE = 'gen_news.data'
+RANDOM_FILE = 'news.data'
+EPOCH_FILE = 'epoch_news.data' # store samples every epoch during adversarial training
 
 # Genrator Parameters
-g_embed_dim = 64
+g_embed_dim = 512
 g_hidden_dim = 32
 # g_hidden_layer = 3
 # g_seq_len = 20
@@ -77,13 +77,13 @@ g_hidden_dim = 32
 
 # Discriminator Parameters
 d_num_class = 2
-d_embed_dim = 64
-d_filter_sizes = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 15, 20]
+d_embed_dim = 512
+# d_filter_sizes = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 15, 20]
 # d_filter_sizes = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 12]
-# d_filter_sizes = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10]
-d_num_filters = [100, 200, 200, 200, 200, 100, 100, 100, 100, 100, 160, 160]
+d_filter_sizes = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10]
+# d_num_filters = [100, 200, 200, 200, 200, 100, 100, 100, 100, 100, 160, 160]
 # d_num_filters = [100, 200, 200, 200, 200, 100, 100, 100, 100, 100, 160]
-# d_num_filters = [100, 200, 200, 200, 200, 100, 100, 100, 100, 100]
+d_num_filters = [100, 200, 200, 200, 200, 100, 100, 100, 100, 100]
 d_dropout_prob = 0.2
 
 
@@ -396,10 +396,10 @@ if __name__ == '__main__':
         train_generator_MLE(generator, gen_data_iter, nll_loss,
             gen_pre_optimizer, args.gk_epochs, gen_pretrain_train_loss, args)
         generate_samples(generator, gen_data_iter, args, NEGATIVE_FILE, ad_train=True, epoch_file=EPOCH_FILE)
-        eval_iter = prepare_dataloaders(NEGATIVE_FILE, args.batch_size)
-        gen_loss = eval_generator(target_lstm, eval_iter, nll_loss, args)
-        gen_pretrain_eval_loss.append(gen_loss)
-        print("eval loss: {:.5f}\n".format(gen_loss))
+        # eval_iter = prepare_dataloaders(NEGATIVE_FILE, args.batch_size)
+        # gen_loss = eval_generator(target_lstm, eval_iter, nll_loss, args)
+        # gen_pretrain_eval_loss.append(gen_loss)
+        # print("eval loss: {:.5f}\n".format(gen_loss))
     print('#####################################################\n\n')
 
     # Pre-train discriminator
@@ -433,19 +433,19 @@ if __name__ == '__main__':
         # generate_samples(generator, args.batch_size, args.n_samples, NEGATIVE_FILE, ad_train=True, epoch_file=EPOCH_FILE)
         generate_samples(generator, gen_data_iter, args, NEGATIVE_FILE, ad_train=True, epoch_file=EPOCH_FILE)
 
-        gen_eval_iter = prepare_dataloaders(NEGATIVE_FILE, args.batch_size)
+        # gen_eval_iter = prepare_dataloaders(NEGATIVE_FILE, args.batch_size)
         dis_eval_iter = DisDataIter(POSITIVE_FILE, NEGATIVE_FILE, args.batch_size)
-        gen_loss = eval_generator(target_lstm, gen_eval_iter, nll_loss, args)
-        gen_adversarial_eval_loss.append(gen_loss)
+        # gen_loss = eval_generator(target_lstm, gen_eval_iter, nll_loss, args)
+        # gen_adversarial_eval_loss.append(gen_loss)
         dis_loss, dis_acc = eval_discriminator(discriminator, dis_eval_iter, nll_loss, args)
         dis_adversarial_eval_loss.append(dis_loss)
         dis_adversarial_eval_acc.append(dis_acc)
-        print("gen eval loss: {:.5f}, dis eval loss: {:.5f}, dis eval acc: {:.3f}\n"
-            .format(gen_loss, dis_loss, dis_acc))
-        # print("dis eval loss: {:.5f}, dis eval acc: {:.3f}\n"
-        #       .format(dis_loss, dis_acc))
+        # print("gen eval loss: {:.5f}, dis eval loss: {:.5f}, dis eval acc: {:.3f}\n"
+        #     .format(gen_loss, dis_loss, dis_acc))
+        print("dis eval loss: {:.5f}, dis eval acc: {:.3f}\n"
+              .format(dis_loss, dis_acc))
 
-
+    """
     # Save experiment data
     with open(args.data_path + 'experiment_plot_0421_n.pkl', 'wb') as f:
         pkl.dump(
@@ -463,4 +463,4 @@ if __name__ == '__main__':
             f,
             protocol=pkl.HIGHEST_PROTOCOL
         )
-
+    """
