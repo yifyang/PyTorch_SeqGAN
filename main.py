@@ -22,7 +22,7 @@ from transformer.Models import Transformer
 
 # Arguemnts
 parser = argparse.ArgumentParser(description='Attention_SeqGAN')
-parser.add_argument('--hpc', action='store_true', default=False,
+parser.add_argument('--hpc', action='store_true', default=True,
                     help='set to hpc mode')
 parser.add_argument('--data_path', type=str, default='dataset/', metavar='PATH',
                     help='data path to save files (default: dataset/)')
