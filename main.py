@@ -22,7 +22,7 @@ from transformer.Models import Transformer
 
 # Arguemnts
 parser = argparse.ArgumentParser(description='Attention_SeqGAN')
-parser.add_argument('--hpc', action='store_true', default=True,
+parser.add_argument('--hpc', action='store_true', default=False,
                     help='set to hpc mode')
 parser.add_argument('--data_path', type=str, default='dataset/', metavar='PATH',
                     help='data path to save files (default: dataset/)')
@@ -376,13 +376,13 @@ if __name__ == '__main__':
     dis_adversarial_train_acc = []
     dis_adversarial_eval_loss = []
     dis_adversarial_eval_acc = []
-
+    """
     # Generate toy data using target LSTM
     print('#####################################################')
     print('Generating data ...')
     print('#####################################################\n\n')
     generate_samples(target_lstm, args.batch_size, args.n_samples, POSITIVE_FILE, toy_data=True)
-
+    """
     # Pre-train generator using MLE
     print('#####################################################')
     print('Start pre-training generator with MLE...')
