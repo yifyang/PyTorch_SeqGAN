@@ -28,9 +28,9 @@ parser.add_argument('--data_path', type=str, default='dataset/', metavar='PATH',
                     help='data path to save files (default: dataset/)')
 parser.add_argument('--rounds', type=int, default=200, metavar='N',  # 100
                     help='rounds of adversarial training (default: 150)')
-parser.add_argument('--g_pretrain_steps', type=int, default=200, metavar='N', # 50
+parser.add_argument('--g_pretrain_steps', type=int, default=300, metavar='N', # 50
                     help='steps of pre-training of generators (default: 120)')
-parser.add_argument('--d_pretrain_steps', type=int, default=70, metavar='N', # 100
+parser.add_argument('--d_pretrain_steps', type=int, default=50, metavar='N', # 100
                     help='steps of pre-training of discriminators (default: 50)')
 parser.add_argument('--g_steps', type=int, default=1, metavar='N', # 1
                     help='steps of generator updates in one round of adverarial training (default: 1)')
@@ -64,9 +64,9 @@ parser.add_argument('--seq_len', type=int, default=10, metavar='S',
 
 # Files
 POSITIVE_FILE = 'news.data'
-NEGATIVE_FILE = 'gen_news.data'
+NEGATIVE_FILE = 'gen_news_0425.data'
 RANDOM_FILE = 'news_rand.data'
-EPOCH_FILE = 'epoch_news.data' # store samples every epoch during adversarial training
+EPOCH_FILE = 'epoch_news_0425.data' # store samples every epoch during adversarial training
 
 # Genrator Parameters
 g_embed_dim = 512
@@ -427,7 +427,7 @@ if __name__ == '__main__':
     for i in range(args.rounds):
         print("Round {}".format(i))
         adversarial_train(generator, discriminator, gen_data_iter, rollout,
-            pg_loss, nll_loss, gen_pre_optimizer, dis_optimizer,
+            pg_loss, nll_loss, gen_optimizer, dis_optimizer,
             dis_adversarial_train_loss, dis_adversarial_train_acc, args)
 
         # generate_samples(generator, args.batch_size, args.n_samples, NEGATIVE_FILE, ad_train=True, epoch_file=EPOCH_FILE)
