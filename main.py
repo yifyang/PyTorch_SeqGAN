@@ -224,8 +224,8 @@ def train_generator_PG(gen, dis, gen_data_iter, rollout, pg_loss, optimizer, epo
         loss = pg_loss(output, targets, rewards)
         optimizer.zero_grad()
         loss.backward()
-        # optimizer.step()
-        optimizer.step_and_update_lr()
+        optimizer.step()
+        # optimizer.step_and_update_lr()
 
         print("Epoch {}, train loss: {:.5f}".format(epoch, loss))
 
