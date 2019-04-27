@@ -21,11 +21,11 @@ parser.add_argument('--hpc', action='store_true', default=True,
                     help='set to hpc mode')
 parser.add_argument('--data_path', type=str, default='dataset/', metavar='PATH',
                     help='data path to save files (default: dataset/)')
-parser.add_argument('--rounds', type=int, default=200, metavar='N',
+parser.add_argument('--rounds', type=int, default=100, metavar='N',
                     help='rounds of adversarial training (default: 200)')
-parser.add_argument('--g_pretrain_steps', type=int, default=200, metavar='N',
+parser.add_argument('--g_pretrain_steps', type=int, default=50, metavar='N',
                     help='steps of pre-training of generators (default: 200)')
-parser.add_argument('--d_pretrain_steps', type=int, default=70, metavar='N',
+parser.add_argument('--d_pretrain_steps', type=int, default=100, metavar='N',
                     help='steps of pre-training of discriminators (default: 70)')
 parser.add_argument('--g_steps', type=int, default=1, metavar='N',
                     help='steps of generator updates in one round of adverarial training (default: 1)')
@@ -57,8 +57,8 @@ parser.add_argument('--seed', type=int, default=1, metavar='S',
 
 # Files
 POSITIVE_FILE = 'plot.data'
-NEGATIVE_FILE = 'gen_plot.data'
-EPOCH_FILE = 'epoch_plot.data' # store samples every epoch during adversarial training
+NEGATIVE_FILE = 'gen_plot_0427.data'
+EPOCH_FILE = 'epoch_plot_0427.data' # store samples every epoch during adversarial training
 
 
 # Genrator Parameters
