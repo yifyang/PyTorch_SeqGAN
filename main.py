@@ -44,12 +44,12 @@ parser.add_argument('--update_rate', type=float, default=0.8, metavar='UR',
                     help='update rate of roll-out model (default: 0.8)')
 parser.add_argument('--n_rollout', type=int, default=16, metavar='N',
                     help='number of roll-out (default: 16)')
-parser.add_argument('--vocab_size', type=int, default=28261, metavar='N',
-                    help='vocabulary size (default: 28261, 7521)')
+parser.add_argument('--vocab_size', type=int, default=13450, metavar='N',
+                    help='vocabulary size (default: 13450, 28261, 7521)')
 parser.add_argument('--batch_size', type=int, default=64, metavar='N',
                     help='batch size (default: 64)')
-parser.add_argument('--n_samples', type=int, default=35094, metavar='N',
-                    help='number of samples gerenated per time (default: 35094, 3317)')
+parser.add_argument('--n_samples', type=int, default=12541, metavar='N',
+                    help='number of samples gerenated per time (default: 12541, 35094, 3317)')
 parser.add_argument('--gen_lr', type=float, default=1e-3, metavar='LR',
                     help='learning rate of generator optimizer (default: 1e-3)')
 parser.add_argument('--dis_lr', type=float, default=1e-3, metavar='LR',
@@ -63,10 +63,10 @@ parser.add_argument('--seq_len', type=int, default=10, metavar='S',
 
 
 # Files
-POSITIVE_FILE = 'news.data'
-NEGATIVE_FILE = 'gen_news_0425.data'
-RANDOM_FILE = 'news_rand.data'
-EPOCH_FILE = 'epoch_news_0425.data' # store samples every epoch during adversarial training
+POSITIVE_FILE = 'imdb.data'
+NEGATIVE_FILE = 'gen_imdb_0427.data'
+RANDOM_FILE = 'imdb_rand.data'
+EPOCH_FILE = 'epoch_imdb_0427.data' # store samples every epoch during adversarial training
 
 # Genrator Parameters
 g_embed_dim = 512
