@@ -127,7 +127,7 @@ def generate_samples(model, data_iter, args, output_file, toy_data=False, ad_tra
                 fout.write('%s\n' % string)
 
 
-def cal_performance(pred, gold, critireon, smoothing=True):
+def cal_performance(pred, gold, critireon, smoothing=False):
     ''' Apply label smoothing if needed '''
 
     loss = cal_loss(pred, gold, critireon, smoothing)
