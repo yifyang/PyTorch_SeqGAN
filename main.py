@@ -44,11 +44,11 @@ parser.add_argument('--update_rate', type=float, default=0.8, metavar='UR',
                     help='update rate of roll-out model (default: 0.8)')
 parser.add_argument('--n_rollout', type=int, default=16, metavar='N',
                     help='number of roll-out (default: 16)')
-parser.add_argument('--vocab_size', type=int, default=13450, metavar='N',
+parser.add_argument('--vocab_size', type=int, default=28261, metavar='N',
                     help='vocabulary size (default: 13450, 28261, 7521)')
 parser.add_argument('--batch_size', type=int, default=64, metavar='N',
                     help='batch size (default: 64)')
-parser.add_argument('--n_samples', type=int, default=12541, metavar='N',
+parser.add_argument('--n_samples', type=int, default=35094, metavar='N',
                     help='number of samples gerenated per time (default: 12541, 35094, 3317)')
 parser.add_argument('--gen_lr', type=float, default=1e-3, metavar='LR',
                     help='learning rate of generator optimizer (default: 1e-3)')
@@ -63,10 +63,10 @@ parser.add_argument('--seq_len', type=int, default=10, metavar='S',
 
 
 # Files
-POSITIVE_FILE = 'imdb.data'
-NEGATIVE_FILE = 'gen_imdb_0427_n.data'
-RANDOM_FILE = 'imdb_rand.data'
-EPOCH_FILE = 'epoch_imdb_0427_n.data' # store samples every epoch during adversarial training
+POSITIVE_FILE = 'news.data'
+NEGATIVE_FILE = 'gen_news_0429.data'
+RANDOM_FILE = 'news_rand.data'
+EPOCH_FILE = 'epoch_news_0429.data' # store samples every epoch during adversarial training
 
 # Genrator Parameters
 g_embed_dim = 512
@@ -197,37 +197,44 @@ def train_generator_PG(gen, dis, gen_data_iter, rollout, pg_loss, optimizer, epo
     """
     Train generator with the guidance of policy gradient
     """
-    sample_batch = gen_data_iter.__iter__().__next__()
-    if args.cuda:
-        src_seq, src_pos, tgt_seq, tgt_pos = map(lambda x: x.cuda(), sample_batch)
-    else:
-        src_seq, src_pos, tgt_seq, tgt_pos = map(lambda x: x.cpu(), sample_batch)
+    # sample_batch = gen_data_iter.__iter__().__next__()
+    # if args.cuda:
+    #     src_seq, src_pos, tgt_seq, tgt_pos = map(lambda x: x.cuda(), sample_batch)
+    # else:
+    #     src_seq, src_pos, tgt_seq, tgt_pos = map(lambda x: x.cpu(), sample_batch)
 
     for epoch in range(epochs):
         # construct the input to the genrator, add zeros before samples and delete the last column
-        # model.sample(tgt_seq, tgt_pos, len(tgt_seq), seq_len)
+        total_loss = 0
+        for batch in gen_data_iter:
+            if args.cuda:
+                src_seq, src_pos, tgt_seq, tgt_pos = map(lambda x: x.cuda(), batch)
+            else:
+                src_seq, src_pos, tgt_seq, tgt_pos = map(lambda x: x.cpu(), batch)
+            # gold = tgt_seq[:, :-1]
+            samples = generator.sample(tgt_seq, tgt_pos, len(tgt_seq), args.seq_len)
+            # zeros = torch.zeros(args.batch_size, 1, dtype=torch.int64)
+            # if args.cuda:
+            #     zeros = zeros.cuda()
+            # inputs = torch.cat([zeros, samples.data], dim = 1)[:, :-1].contiguous()
+            targets = tgt_seq[:, :-1].data.contiguous().view((-1,))
 
-        samples = generator.sample(tgt_seq, tgt_pos, len(tgt_seq), args.seq_len)
-        # zeros = torch.zeros(args.batch_size, 1, dtype=torch.int64)
-        # if args.cuda:
-        #     zeros = zeros.cuda()
-        # inputs = torch.cat([zeros, samples.data], dim = 1)[:, :-1].contiguous()
-        targets = tgt_seq[:, :-1].data.contiguous().view((-1,))
+            # calculate the reward
+            rewards = torch.tensor(rollout.get_reward(samples, tgt_seq, tgt_pos, args.n_rollout, dis))
+            if args.cuda:
+                rewards = rewards.cuda()
 
-        # calculate the reward
-        rewards = torch.tensor(rollout.get_reward(samples, tgt_seq, tgt_pos, args.n_rollout, dis))
-        if args.cuda:
-            rewards = rewards.cuda()
+            # update generator
+            output = gen(samples, src_pos, tgt_seq, tgt_pos)
+            loss = pg_loss(output, targets, rewards)
+            optimizer.zero_grad()
+            loss.backward()
+            optimizer.step()
+            total_loss += loss.item()
+            # optimizer.step_and_update_lr()
 
-        # update generator
-        output = gen(samples, src_pos, tgt_seq, tgt_pos)
-        loss = pg_loss(output, targets, rewards)
-        optimizer.zero_grad()
-        loss.backward()
-        optimizer.step()
-        # optimizer.step_and_update_lr()
-
-        print("Epoch {}, train loss: {:.5f}".format(epoch, loss))
+        avg_loss = total_loss / len(gen_data_iter)
+        print("Epoch {}, train loss: {:.5f}".format(epoch, avg_loss))
 
 
 def eval_generator(model, data_iter, criterion, args):
