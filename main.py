@@ -28,7 +28,7 @@ parser.add_argument('--data_path', type=str, default='dataset/', metavar='PATH',
                     help='data path to save files (default: dataset/)')
 parser.add_argument('--rounds', type=int, default=200, metavar='N',  # 100
                     help='rounds of adversarial training (default: 150)')
-parser.add_argument('--g_pretrain_steps', type=int, default=300, metavar='N', # 50
+parser.add_argument('--g_pretrain_steps', type=int, default=120, metavar='N', # 50
                     help='steps of pre-training of generators (default: 120)')
 parser.add_argument('--d_pretrain_steps', type=int, default=50, metavar='N', # 100
                     help='steps of pre-training of discriminators (default: 50)')
@@ -44,11 +44,11 @@ parser.add_argument('--update_rate', type=float, default=0.8, metavar='UR',
                     help='update rate of roll-out model (default: 0.8)')
 parser.add_argument('--n_rollout', type=int, default=16, metavar='N',
                     help='number of roll-out (default: 16)')
-parser.add_argument('--vocab_size', type=int, default=28261, metavar='N',
+parser.add_argument('--vocab_size', type=int, default=20, metavar='N',
                     help='vocabulary size (default: 13450, 28261, 7521)')
 parser.add_argument('--batch_size', type=int, default=64, metavar='N',
                     help='batch size (default: 64)')
-parser.add_argument('--n_samples', type=int, default=35094, metavar='N',
+parser.add_argument('--n_samples', type=int, default=6400, metavar='N',
                     help='number of samples gerenated per time (default: 12541, 35094, 3317)')
 parser.add_argument('--gen_lr', type=float, default=1e-3, metavar='LR',
                     help='learning rate of generator optimizer (default: 1e-3)')
@@ -58,18 +58,18 @@ parser.add_argument('--no_cuda', action='store_true', default=False,
                     help='disables CUDA training')
 parser.add_argument('--seed', type=int, default=1, metavar='S',
                     help='random seed (default: 1)')
-parser.add_argument('--seq_len', type=int, default=10, metavar='S',
+parser.add_argument('--seq_len', type=int, default=20, metavar='S',
                     help='random seed (default: 10)')
 
 
 # Files
-POSITIVE_FILE = 'news_0429.data'
-NEGATIVE_FILE = 'gen_news_0429.data'
-RANDOM_FILE = 'news_rand_0429.data'
-EPOCH_FILE = 'epoch_news_0429.data' # store samples every epoch during adversarial training
+POSITIVE_FILE = 'plot_0429.data'
+NEGATIVE_FILE = 'gen_plot_0429.data'
+RANDOM_FILE = 'plot_rand.data'
+EPOCH_FILE = 'epoch_plot_0429.data' # store samples every epoch during adversarial training
 
 # Genrator Parameters
-g_embed_dim = 512
+g_embed_dim = 64
 g_hidden_dim = 32
 # g_hidden_layer = 3
 # g_seq_len = 20
@@ -77,10 +77,10 @@ g_hidden_dim = 32
 
 # Discriminator Parameters
 d_num_class = 2
-d_embed_dim = 512
-# d_filter_sizes = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 15, 20]
+d_embed_dim = 64
+d_filter_sizes = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 15, 20]
 # d_filter_sizes = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 12]
-d_filter_sizes = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10]
+# d_filter_sizes = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10]
 # d_num_filters = [100, 200, 200, 200, 200, 100, 100, 100, 100, 100, 160, 160]
 # d_num_filters = [100, 200, 200, 200, 200, 100, 100, 100, 100, 100, 160]
 d_num_filters = [100, 200, 200, 200, 200, 100, 100, 100, 100, 100]
@@ -383,13 +383,13 @@ if __name__ == '__main__':
     dis_adversarial_train_acc = []
     dis_adversarial_eval_loss = []
     dis_adversarial_eval_acc = []
-    """
+
     # Generate toy data using target LSTM
     print('#####################################################')
     print('Generating data ...')
     print('#####################################################\n\n')
     generate_samples(target_lstm, args.batch_size, args.n_samples, POSITIVE_FILE, toy_data=True)
-    """
+    
     # Pre-train generator using MLE
     print('#####################################################')
     print('Start pre-training generator with MLE...')
