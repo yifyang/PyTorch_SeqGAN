@@ -63,9 +63,9 @@ parser.add_argument('--seq_len', type=int, default=10, metavar='S',
 
 
 # Files
-POSITIVE_FILE = 'news.data'
+POSITIVE_FILE = 'news_0429.data'
 NEGATIVE_FILE = 'gen_news_0429.data'
-RANDOM_FILE = 'news_rand.data'
+RANDOM_FILE = 'news_rand_0429.data'
 EPOCH_FILE = 'epoch_news_0429.data' # store samples every epoch during adversarial training
 
 # Genrator Parameters
