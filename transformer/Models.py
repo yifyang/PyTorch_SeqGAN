@@ -157,7 +157,7 @@ class Transformer(nn.Module):
     def __init__(
             self,
             n_src_vocab, n_tgt_vocab, len_max_seq,
-            d_word_vec=64, d_model=64, d_inner=256,
+            d_word_vec=512, d_model=512, d_inner=2048,
             n_layers=6, n_head=8, d_k=64, d_v=64, dropout=0.1,
             tgt_emb_prj_weight_sharing=False,
             emb_src_tgt_weight_sharing=False):
