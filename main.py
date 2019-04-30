@@ -403,10 +403,10 @@ if __name__ == '__main__':
         train_generator_MLE(generator, gen_data_iter, nll_loss,
             gen_pre_optimizer, args.gk_epochs, gen_pretrain_train_loss, args)
         generate_samples(generator, gen_data_iter, args, NEGATIVE_FILE, ad_train=True, epoch_file=EPOCH_FILE)
-        # eval_iter = prepare_dataloaders(NEGATIVE_FILE, args.batch_size)
-        # gen_loss = eval_generator(target_lstm, eval_iter, nll_loss, args)
-        # gen_pretrain_eval_loss.append(gen_loss)
-        # print("eval loss: {:.5f}\n".format(gen_loss))
+        eval_iter = prepare_dataloaders(NEGATIVE_FILE, args.batch_size)
+        gen_loss = eval_generator(target_lstm, eval_iter, nll_loss, args)
+        gen_pretrain_eval_loss.append(gen_loss)
+        print("eval loss: {:.5f}\n".format(gen_loss))
     print('#####################################################\n\n')
 
     # Pre-train discriminator
@@ -440,21 +440,21 @@ if __name__ == '__main__':
         # generate_samples(generator, args.batch_size, args.n_samples, NEGATIVE_FILE, ad_train=True, epoch_file=EPOCH_FILE)
         generate_samples(generator, gen_data_iter, args, NEGATIVE_FILE, ad_train=True, epoch_file=EPOCH_FILE)
 
-        # gen_eval_iter = prepare_dataloaders(NEGATIVE_FILE, args.batch_size)
+        gen_eval_iter = prepare_dataloaders(NEGATIVE_FILE, args.batch_size)
         dis_eval_iter = DisDataIter(POSITIVE_FILE, NEGATIVE_FILE, args.batch_size)
-        # gen_loss = eval_generator(target_lstm, gen_eval_iter, nll_loss, args)
-        # gen_adversarial_eval_loss.append(gen_loss)
+        gen_loss = eval_generator(target_lstm, gen_eval_iter, nll_loss, args)
+        gen_adversarial_eval_loss.append(gen_loss)
         dis_loss, dis_acc = eval_discriminator(discriminator, dis_eval_iter, nll_loss, args)
         dis_adversarial_eval_loss.append(dis_loss)
         dis_adversarial_eval_acc.append(dis_acc)
-        # print("gen eval loss: {:.5f}, dis eval loss: {:.5f}, dis eval acc: {:.3f}\n"
-        #     .format(gen_loss, dis_loss, dis_acc))
-        print("dis eval loss: {:.5f}, dis eval acc: {:.3f}\n"
-              .format(dis_loss, dis_acc))
+        print("gen eval loss: {:.5f}, dis eval loss: {:.5f}, dis eval acc: {:.3f}\n"
+            .format(gen_loss, dis_loss, dis_acc))
+        # print("dis eval loss: {:.5f}, dis eval acc: {:.3f}\n"
+        #       .format(dis_loss, dis_acc))
 
-    """
+
     # Save experiment data
-    with open(args.data_path + 'experiment_plot_0421_n.pkl', 'wb') as f:
+    with open(args.data_path + 'experiment_plot_0429.pkl', 'wb') as f:
         pkl.dump(
             (gen_pretrain_train_loss,
                 gen_pretrain_eval_loss,
@@ -470,4 +470,4 @@ if __name__ == '__main__':
             f,
             protocol=pkl.HIGHEST_PROTOCOL
         )
-    """
+
