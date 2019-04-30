@@ -24,5 +24,5 @@ class PGLoss(nn.Module):
         one_hot.scatter_(1, target.data.view(-1, 1), 1)
         loss = torch.masked_select(pred, one_hot) # select the probability predicted of the target word
         loss = loss * reward.contiguous().view(-1)
-        loss = torch.sum(loss)
+        loss = -torch.sum(loss)
         return loss
